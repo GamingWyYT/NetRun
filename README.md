@@ -1,6 +1,5 @@
 # NetRun
 Funny Hacking Game
 
-"Bug Tracker"
-A. Can Not Return To Home After Leaving
-B. When Moving Onto Device, Hides Device
+![GitHub commit activity](https://img.shields.io/github/commit-activity/t/GamingWyYT/NetRun?logo=Github&label=Commits)
+![GitHub contributors](https://img.shields.io/github/contributors/GamingWyYT/NetRun?logo=github&label=Contributors)

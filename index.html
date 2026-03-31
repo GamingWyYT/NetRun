@@ -1479,7 +1479,7 @@
       const { maxNodes } = getRigStats();
       const vis = Object.values(nodes).filter(x => x.visible).length;
       if (vis >= maxNodes) { addLog('Node limit reached — upgrade RAM', 'var(--warn)'); return; }
-      currentNode.scanned = currentNode.type === 'home' ? false: true; player.canScan = false;
+      currentNode.scanned = !(currentNode.type === 'home'); player.canScan = false;
       const nets = currentNode.type === "home" ? generateNetwork(currentNode, 1): generateNetwork(currentNode, maxNodes - vis);
       nets.forEach(n => { renderNode(n); addLineFor(currentNode, n); });
       addLog(`Scanned: found ${nets.length} network(s)`, '#0096ff');

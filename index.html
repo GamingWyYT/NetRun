@@ -888,7 +888,7 @@
         <button class="stab active" onclick="shopTabClick('mb',this)">Motherboard</button>
         <button class="stab" onclick="shopTabClick('cpu',this)">CPU</button>
         <button class="stab" onclick="shopTabClick('ram',this)">RAM</button>
-        <button class="stab" onclick="shopTabClick('net',this)">NIC</button>
+        <button class="stab" onclick="shopTabClick('net',this)">NET</button>
         <button class="stab" onclick="shopTabClick('gpu',this)">GPU</button>
       </div>
       <div class="parts-grid" id="parts-grid"></div>
@@ -1011,12 +1011,12 @@
       { id: 'ram17', name: 'NovaTech 8TB DDR8', star: 6, type: 'ram', cost: 100000, memType: 'DDR8', sticks: 16, nodeBonus: 1000, spec: 'DDR8 · 16 sticks · +1000 nodes', desc: 'True Power' }
     ],
     net: [
-      { id: 'net1', name: 'NetLink 1G', star: 1, type: 'net', cost: 0, scanRange: 1, traceReduce: 0, spec: 'Range 1 · -0% trace', desc: 'Basic NIC' },
-      { id: 'net2', name: 'NetLink 10G', star: 2, type: 'net', cost: 300, scanRange: 2, traceReduce: 8, spec: 'Range 2 · -8% trace', desc: '10G NIC' },
-      { id: 'net3', name: 'PhantomNet 25G', star: 3, type: 'net', cost: 700, scanRange: 3, traceReduce: 18, spec: 'Range 3 · -18% trace', desc: 'Stealth NIC' },
-      { id: 'net4', name: 'PhantomNet 100G', star: 4, type: 'net', cost: 1500, scanRange: 4, traceReduce: 28, spec: 'Range 4 · -28% trace', desc: '100G pro NIC' },
-      { id: 'net5', name: 'PhantomNet Ghost', star: 5, type: 'net', cost: 3000, scanRange: 6, traceReduce: 40, spec: 'Range 6 · -40% trace', desc: 'Ultra-stealth NIC' },
-      { id: 'net6', name: 'PhantomNet Ghost V2', star: 5, type: 'net', cost: 3000, scanRange: 7, traceReduce: 50, spec: 'Range 7 · -50% trace', desc: 'Ultra-stealth NIC' },
+      { id: 'net1', name: 'NetLink 1G', star: 1, type: 'net', cost: 0, scanRange: 1, traceReduce: 0, spec: 'Range 1 · -0% trace', desc: 'Basic NET' },
+      { id: 'net2', name: 'NetLink 10G', star: 2, type: 'net', cost: 300, scanRange: 2, traceReduce: 8, spec: 'Range 2 · -8% trace', desc: '10G NET' },
+      { id: 'net3', name: 'PhantomNet 25G', star: 3, type: 'net', cost: 700, scanRange: 3, traceReduce: 18, spec: 'Range 3 · -18% trace', desc: 'Stealth NET' },
+      { id: 'net4', name: 'PhantomNet 100G', star: 4, type: 'net', cost: 1500, scanRange: 4, traceReduce: 28, spec: 'Range 4 · -28% trace', desc: '100G pro NET' },
+      { id: 'net5', name: 'PhantomNet Ghost', star: 5, type: 'net', cost: 3000, scanRange: 6, traceReduce: 40, spec: 'Range 6 · -40% trace', desc: 'Ultra-stealth NET' },
+      { id: 'net6', name: 'PhantomNet Ghost V2', star: 5, type: 'net', cost: 3000, scanRange: 7, traceReduce: 50, spec: 'Range 7 · -50% trace', desc: 'Ultra-stealth NET' },
       { id: 'net7', name: 'PhantomNet Invisibility', star: 7, type: 'net', cost: 3000, scanRange: 10, traceReduce: 95, spec: 'Range 10 · -95% trace', desc: 'True-stealth Techonology' },
     ],
     gpu: [
@@ -1708,6 +1708,7 @@
 
     function buySelected() {
       if (!shopSelected) return;
+      if (inventory.has(p.name)) addLog(`You already own this item ${p.name}`); return;
       const p = ALL_PARTS.find(x => x.id === shopSelected); if (!p) return;
       if (player.money < p.cost) { document.getElementById('shop-status').textContent = 'Insufficient funds'; addLog('Insufficient funds', 'var(--warn)'); return; }
       player.money -= p.cost;
@@ -1739,7 +1740,7 @@
       renderBuilderStats();
     }
 
-    const SLOT_LABELS = { mb: 'Motherboard', cpu: 'CPU', ram: 'RAM', net: 'NIC', gpu: 'GPU (opt.)' };
+    const SLOT_LABELS = { mb: 'Motherboard', cpu: 'CPU', ram: 'RAM', net: 'NET', gpu: 'GPU (opt.)' };
 
     function renderBuilderSlots() {
       const container = document.getElementById('builder-slots');
@@ -1767,7 +1768,7 @@
     }
 
     function removeFromSlot(slotType) {
-      if (slotType === 'mb') { pendingRig.cpu = null; pendingRig.ram = null; }// clearing MB clears incompatible
+      if (slotType === 'mb') { pendingRig.cpu = null; pendingRig.ram = null; }
       pendingRig[slotType] = null;
       renderBuilder();
     }
@@ -1818,7 +1819,6 @@
     function renderBuilderInv() {
       const list = document.getElementById('inv-list'); if (!list) return;
       list.innerHTML = '';
-      // Deduplicate by id but show count
       const counts = {};
       inventory.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
       const shown = new Set();
@@ -1843,7 +1843,6 @@
 
     function renderBuilderStats() {
       const el = document.getElementById('builder-stats');
-      // Temporarily set rig to pending to calculate stats
       const savedRig = { ...rig };
       if (pendingRig.mb && pendingRig.cpu && pendingRig.ram && pendingRig.net) {
         rig = { ...pendingRig };
@@ -1987,13 +1986,15 @@
         ].join('\n'));
       },
       money(n) {
-        player.money = n; updateHUD();
+        player.money = n; 
+        updateHUD();
         console.log(`Credits set to $${n}`);
       },
       trace(n) {
         if (!currentNode) { console.warn('Open a node popup first'); return; }
         addNodeTrace(currentNode.id, n - getNodeTrace(currentNode.id).amount);
-        updateNodeVisual(currentNode.id); refreshPopup();
+        updateNodeVisual(currentNode.id); 
+        refreshPopup();
         console.log(`Node ${currentNode.id} trace set to ${n}`);
       },
       clearTrace() {
@@ -2001,7 +2002,8 @@
           nodeTraces[nid] = { amount: 0, lockedUntil: 0 };
           updateNodeVisual(nid);
         });
-        if (currentNode) refreshPopup();
+        if (currentNode) 
+        refreshPopup();
         console.log('All traces cleared');
       },
       hackAll() {

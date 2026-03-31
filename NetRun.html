@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NETRUN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #080d14;
+      --panel: #0b1219;
+      --panel2: #0e1825;
+      --panel3: #111e2e;
+      --border: #0ff2;
+      --border2: #0ff5;
+      --home: #00ff96;
+      --net: #0096ff;
+      --dev: #778899;
+      --text: #c0e0ff;
+      --muted: #4a6a8a;
+      --gold: #ffd700;
+      --warn: #ffaa00;
+      --danger: #ff4444;
+      --mono: 'Share Tech Mono', monospace;
+      --ui: 'Rajdhani', sans-serif;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      overflow: hidden
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh
+    }
+
+    /* HUD */
+    #hud {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      min-height: 38px
+    }
+
+    .logo {
+      font-size: 13px;
+      letter-spacing: .25em;
+      color: var(--home)
+    }
+
+    .hstat {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .hlbl {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-family: var(--ui)
+    }
+
+    .hval {
+      font-size: 13px;
+      font-family: var(--ui);
+      font-weight: 600
+    }
+
+    #money-val {
+      color: var(--home)
+    }
+
+
+    .hbtn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .hbtn:hover {
+      background: #0ff1;
+      border-color: #0ff8;
+      color: #fff
+    }
+
+    /* Canvas */
+    #canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: default
+    }
+
+    #grid-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none
+    }
+
+    #node-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible
+    }
+
+    /* Popup */
+    #popup {
+      position: absolute;
+      width: 220px;
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 12px;
+      display: none;
+      z-index: 20;
+      font-family: var(--ui)
+    }
+
+    #popup h3 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      margin-bottom: 3px
+    }
+
+    .pmeta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.5
+    }
+
+    .pstars {
+      color: var(--gold);
+      font-size: 12px;
+      margin-bottom: 6px
+    }
+
+    .ptrace-wrap {
+      width: 100%;
+      height: 5px;
+      background: #1a0808;
+      border: 1px solid #ff44442a;
+      border-radius: 2px;
+      margin-bottom: 8px;
+      overflow: hidden
+    }
+
+    .ptrace-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffaa00, #ff4444);
+      transition: width .3s
+    }
+
+    .pbtn {
+      display: block;
+      width: 100%;
+      margin-bottom: 5px;
+      background: transparent;
+      border: 1px solid #0ff3;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: left;
+      transition: all .15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .pbtn:hover:not(:disabled) {
+      background: #0ff1;
+      border-color: #0ff;
+      color: #fff
+    }
+
+    .pbtn:disabled {
+      opacity: .32;
+      cursor: not-allowed
+    }
+
+    .pbtn.danger {
+      border-color: #ff444455;
+      color: var(--danger)
+    }
+
+    .pbtn.danger:hover:not(:disabled) {
+      background: #ff44441a;
+      border-color: var(--danger)
+    }
+
+    .pclose {
+      color: var(--muted);
+      font-size: 10px;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 4px
+    }
+
+    .pclose:hover {
+      color: #fff
+    }
+
+    /* Modal base */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000b;
+      z-index: 30;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px
+    }
+
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      width: min(760px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 16px;
+      font-family: var(--ui)
+    }
+
+    .modal-box h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--home)
+    }
+
+    .modal-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      flex-wrap: wrap
+    }
+
+    .stab {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .stab:hover {
+      color: var(--text)
+    }
+
+    .stab.active {
+      border-color: var(--home);
+      color: var(--home)
+    }
+
+    .parts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    .part-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative
+    }
+
+    .part-card:hover:not(.incompatible):not(.is-installed) {
+      border-color: var(--border2)
+    }
+
+    .part-card.selected {
+      border-color: var(--home);
+      background: #00ff9610
+    }
+
+    .part-card.incompatible {
+      opacity: .32;
+      cursor: not-allowed
+    }
+
+    .part-card.is-installed {
+      border-color: #00ff9660;
+      cursor: default
+    }
+
+    .part-card.is-owned-inv {
+      border-color: #ffd70055
+    }
+
+    .owned-tag {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      font-size: 9px;
+      background: #00ff9218;
+      color: var(--home);
+      border: 1px solid var(--home);
+      padding: 1px 5px;
+      border-radius: 2px;
+      letter-spacing: .06em;
+      font-family: var(--mono)
+    }
+
+    .inv-tag {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      font-size: 9px;
+      background: #ffd70018;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 1px 5px;
+      border-radius: 2px;
+      letter-spacing: .06em;
+      font-family: var(--mono)
+    }
+
+    .part-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px
+    }
+
+    .part-type-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 4px
+    }
+
+    .part-stars {
+      color: var(--gold);
+      font-size: 11px;
+      margin-bottom: 4px;
+      letter-spacing: 1px
+    }
+
+    .part-spec {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.6
+    }
+
+    .part-cost {
+      font-size: 12px;
+      color: var(--gold);
+      margin-top: 6px;
+      font-weight: 600;
+      font-family: var(--mono)
+    }
+
+    .incompat-reason {
+      font-size: 9px;
+      color: var(--danger);
+      margin-top: 4px;
+      font-family: var(--mono)
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      align-items: center
+    }
+
+    #shop-status {
+      font-size: 11px;
+      color: var(--warn);
+      margin-right: auto
+    }
+
+    .sfbtn {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      background: transparent;
+      transition: all .15s
+    }
+
+    .sfbtn.cancel {
+      border: 1px solid var(--border2);
+      color: var(--muted)
+    }
+
+    .sfbtn.cancel:hover {
+      background: #ffffff08;
+      color: var(--text)
+    }
+
+    .sfbtn.confirm {
+      border: 1px solid var(--home);
+      color: var(--home)
+    }
+
+    .sfbtn.confirm:hover {
+      background: #00ff9618
+    }
+
+    .sfbtn:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    /* PC Builder */
+    #builder-modal {
+      position: absolute;
+      inset: 0;
+      background: #000b;
+      z-index: 30;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px
+    }
+
+    #builder-inner {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      width: min(900px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 16px;
+      font-family: var(--ui)
+    }
+
+    #builder-inner h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--home)
+    }
+
+    #builder-inner p.hint {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 14px
+    }
+
+    .builder-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .builder-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .slot-row {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .slot-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      width: 80px;
+      flex-shrink: 0;
+      font-family: var(--mono)
+    }
+
+    .slot-drop {
+      flex: 1;
+      min-height: 46px;
+      border: 1px dashed var(--border2);
+      border-radius: 5px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+      position: relative
+    }
+
+    .slot-drop.drag-over {
+      border-color: var(--home);
+      background: #00ff9610
+    }
+
+    .slot-drop.filled {
+      border-style: solid;
+      border-color: #0ff4;
+      background: var(--panel2)
+    }
+
+    .slot-drop.error-slot {
+      border-color: var(--danger);
+      background: #ff44441a
+    }
+
+    .slot-part-name {
+      font-size: 11px;
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .slot-part-spec {
+      font-size: 9px;
+      color: var(--muted)
+    }
+
+    .slot-remove {
+      margin-left: auto;
+      font-size: 9px;
+      color: var(--danger);
+      cursor: pointer;
+      padding: 2px 5px;
+      border: 1px solid #ff44443a;
+      border-radius: 2px
+    }
+
+    .slot-remove:hover {
+      background: #ff44441a
+    }
+
+    .slot-empty {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--mono)
+    }
+
+    .slot-stars {
+      font-size: 10px;
+      color: var(--gold);
+      margin-left: 2px
+    }
+
+    .builder-inv {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px
+    }
+
+    .builder-inv h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-family: var(--mono)
+    }
+
+    .inv-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 340px;
+      overflow-y: auto
+    }
+
+    .inv-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      cursor: grab;
+      transition: all .15s;
+      user-select: none
+    }
+
+    .inv-item:hover {
+      border-color: var(--border2);
+      background: var(--panel3)
+    }
+
+    .inv-item.dragging {
+      opacity: .5;
+      cursor: grabbing
+    }
+
+    .inv-item-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .inv-item-sub {
+      font-size: 9px;
+      color: var(--muted);
+      font-family: var(--mono)
+    }
+
+    .inv-item-stars {
+      color: var(--gold);
+      font-size: 10px
+    }
+
+    .builder-stats {
+      margin-top: 12px;
+      padding: 10px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 5px
+    }
+
+    .builder-stats h3 {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-family: var(--mono)
+    }
+
+    .bstat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      padding: 2px 0
+    }
+
+    .bstat-label {
+      color: var(--muted)
+    }
+
+    .bstat-val {
+      color: var(--text);
+      font-family: var(--mono)
+    }
+
+    .bstat-val.good {
+      color: var(--home)
+    }
+
+    .compat-msg {
+      font-size: 10px;
+      color: var(--danger);
+      margin-top: 6px;
+      font-family: var(--mono);
+      line-height: 1.5
+    }
+
+    /* Log */
+    #log {
+      position: absolute;
+      bottom: 50px;
+      left: 8px;
+      width: 300px;
+      font-size: 10px;
+      color: var(--muted);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 1px
+    }
+
+    .log-line {
+      animation: fi .25s ease
+    }
+
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(3px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* Minimap */
+    #minimap {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 130px;
+      height: 85px;
+      background: #08121988;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    #mm-canvas {
+      display: block;
+      width: 130px;
+      height: 85px
+    }
+
+    /* Gameover */
+    #gameover {
+      position: absolute;
+      inset: 0;
+      background: #000c;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 40
+    }
+
+    #gameover h2 {
+      font-size: 28px;
+      color: var(--danger);
+      letter-spacing: .3em;
+      animation: flk 1s infinite
+    }
+
+    @keyframes flk {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .45
+      }
+    }
+
+    #gameover p {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    #gameover button {
+      padding: 8px 24px;
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      font-family: var(--mono);
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 3px
+    }
+
+    #gameover button:hover {
+      background: #ff44441a
+    }
+
+    /* Scrollbars */
+    .modal-box::-webkit-scrollbar,
+    .inv-list::-webkit-scrollbar,
+    #builder-inner::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .modal-box::-webkit-scrollbar-track,
+    .inv-list::-webkit-scrollbar-track,
+    #builder-inner::-webkit-scrollbar-track {
+      background: var(--panel)
+    }
+
+    .modal-box::-webkit-scrollbar-thumb,
+    .inv-list::-webkit-scrollbar-thumb,
+    #builder-inner::-webkit-scrollbar-thumb {
+      background: #0ff3;
+      border-radius: 2px
+    }
+
+    /* Save toast */
+    #save-toast {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--panel);
+      border: 1px solid var(--home);
+      color: var(--home);
+      font-size: 11px;
+      padding: 6px 16px;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+      z-index: 50;
+      font-family: var(--mono)
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="hud">
+      <span class="logo">// NETRUN</span>
+      <div class="hstat"><span class="hlbl">Credits</span><span class="hval" id="money-val">$0</span></div>
+      <div class="hstat"><span class="hlbl">Nodes</span><span class="hval" id="nodes-val">0/8</span></div>
+      <div class="hstat"><span class="hlbl">Hack</span><span class="hval" id="hack-val">30%</span></div>
+      <div style="flex:1"></div>
+      <button class="hbtn" onclick="openBuilder()">[ CONFIGURE RIG ]</button>
+      <button class="hbtn" onclick="openShop()">[ SHOP ]</button>
+      <button class="hbtn" onclick="saveGame()">[ SAVE ]</button>
+      <button class="hbtn" onclick="loadGame()">[ LOAD ]</button>
+      <button class="hbtn" onclick="resetGame()">[ RESET ]</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="grid-canvas"></canvas>
+      <svg id="node-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+            orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#0ff6" stroke-width="1.5" stroke-linecap="round" />
+          </marker>
+        </defs>
+      </svg>
+      <div id="popup">
+        <h3 id="pop-title">NODE</h3>
+        <div class="pmeta" id="pop-meta"></div>
+        <div class="pstars" id="pop-stars"></div>
+        <div style="font-size:9px;color:var(--muted);margin-bottom:3px" id="pop-trace-lbl">NODE TRACE</div>
+        <div class="ptrace-wrap">
+          <div class="ptrace-fill" id="pop-trace-fill"></div>
+        </div>
+        <div style="font-size:9px;color:var(--danger);margin-bottom:8px;display:none" id="pop-lockout">LOCKED OUT</div>
+        <button class="pbtn" id="btn-scan" onclick="doScan()">[ SCAN ]</button>
+        <button class="pbtn" id="btn-hack" onclick="doHack()">[ HACK ]</button>
+        <button class="pbtn" id="btn-login" onclick="doLogin()">[ LOGIN ]</button>
+        <button class="pbtn" id="btn-loot" onclick="doLoot()">[ LOOT ]</button>
+        <button class="pbtn danger" id="btn-remove" onclick="doRemove()">[ REMOVE NODE ]</button>
+        <div class="pclose" onclick="closePopup()">[ CLOSE ]</div>
+      </div>
+      <div id="log"></div>
+      <div id="minimap"><canvas id="mm-canvas" width="130" height="85"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="modal-overlay" id="shop-modal" style="display:flex;display:none">
+    <div class="modal-box">
+      <h2>// HARDWARE SHOP</h2>
+      <div id="rig-summary" style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.8"></div>
+      <div class="modal-tabs">
+        <button class="stab active" onclick="shopTabClick('mb',this)">Motherboard</button>
+        <button class="stab" onclick="shopTabClick('cpu',this)">CPU</button>
+        <button class="stab" onclick="shopTabClick('ram',this)">RAM</button>
+        <button class="stab" onclick="shopTabClick('net',this)">NIC</button>
+        <button class="stab" onclick="shopTabClick('gpu',this)">GPU</button>
+      </div>
+      <div class="parts-grid" id="parts-grid"></div>
+      <div class="modal-footer">
+        <span id="shop-status"></span>
+        <button class="sfbtn cancel" onclick="closeShop()">Cancel</button>
+        <button class="sfbtn confirm" id="shop-buy" onclick="buySelected()" disabled>Purchase Part</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC BUILDER -->
+  <div id="builder-modal">
+    <div id="builder-inner">
+      <h2>// RIG BUILDER</h2>
+      <p class="hint">Drag parts from your inventory into slots. Parts must be compatible.</p>
+      <div class="builder-layout">
+        <div>
+          <div class="builder-slots" id="builder-slots"></div>
+          <div class="builder-stats" id="builder-stats"></div>
+        </div>
+        <div class="builder-inv">
+          <h3>[ INVENTORY ]</h3>
+          <div class="inv-list" id="inv-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span id="builder-status" style="font-size:11px;color:var(--warn);margin-right:auto"></span>
+        <button class="sfbtn cancel" onclick="closeBuilder()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="save-toast">Game saved.</div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════
+       CONSTANTS & CONFIG
+    ═══════════════════════════════════════════════════ */
+    const WORLD_W = 3200, WORLD_H = 2200, LOOT_CD = 5 * 60 * 1000; // 5 minutes
+    const NODE_LOCKOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+    /* ═══════════════════════════════════════════════════
+       PARTS CATALOG
+    ═══════════════════════════════════════════════════ */
+    const PARTS = {
+    mb: [
+      { id: 'mb1', name: 'CoreBit A1', star: 1, type: 'mb', cost: 0, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Starter board' },
+      { id: 'mb2', name: 'NovaTek Z3', star: 1, type: 'mb', cost: 120, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Basic board' },
+      { id: 'mb3', name: 'NovaTek Z5', star: 1, type: 'mb', cost: 220, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Enhanced DDR3' },
+
+      { id: 'mb4', name: 'QuantumX Z5', star: 1, type: 'mb', cost: 300, socket: 'AM4', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Mid-range board' },
+      { id: 'mb5', name: 'QuantumX Z7', star: 2, type: 'mb', cost: 450, socket: 'AM4', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Refined mid-range' },
+      { id: 'mb6', name: 'VoidCore B450', star: 2, type: 'mb', cost: 700, socket: 'LGA2', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Performance DDR4' },
+
+      { id: 'mb7', name: 'QuantumX Z9', star: 2, type: 'mb', cost: 900, socket: 'AM5', memType: 'DDR5', slots: 4, spec: 'AM5 · DDR5 · 4 slots', desc: 'High-end board' },
+      { id: 'mb8', name: 'VoidCore X99', star: 2, type: 'mb', cost: 1400, socket: 'LGA2', memType: 'DDR5', slots: 4, spec: 'LGA2 · DDR5 · 4 slots', desc: 'Workstation DDR5' },
+      { id: 'mb9', name: 'VoidCore X199', star: 3, type: 'mb', cost: 2000, socket: 'LGA2', memType: 'DDR5', slots: 8, spec: 'LGA2 · DDR5 · 8 slots', desc: 'Extreme DDR5' },
+
+      { id: 'mb10', name: 'VoidCore X299', star: 3, type: 'mb', cost: 2600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'Next-gen entry' },
+      { id: 'mb11', name: 'VoidCore X399', star: 3, type: 'mb', cost: 3600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'High bandwidth DDR6' },
+      { id: 'mb12', name: 'OmegaForge X1', star: 3, type: 'mb', cost: 5000, socket: 'AM6', memType: 'DDR6', slots: 8, spec: 'AM6 · DDR6 · 8 slots', desc: 'Extreme DDR6' },
+
+      { id: 'mb13', name: 'OmegaForge X2', star: 4, type: 'mb', cost: 6500, socket: 'AM6', memType: 'DDR7', slots: 4, spec: 'AM6 · DDR7 · 4 slots', desc: 'Next-gen flagship' },
+      { id: 'mb14', name: 'OmegaForge X3', star: 4, type: 'mb', cost: 9000, socket: 'AM7', memType: 'DDR7', slots: 4, spec: 'AM7 · DDR7 · 4 slots', desc: 'Elite DDR7' },
+      { id: 'mb15', name: 'OmegaForge X4', star: 4, type: 'mb', cost: 12000, socket: 'AM7', memType: 'DDR7', slots: 8, spec: 'AM7 · DDR7 · 8 slots', desc: 'Ultimate DDR7' },
+
+      { id: 'mb16', name: 'VovaTech Apex', star: 4, type: 'mb', cost: 15000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Cutting-edge platform' },
+      { id: 'mb17', name: 'VovaTech Apex Pro', star: 5, type: 'mb', cost: 22000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Extreme DDR8' },
+      { id: 'mb18', name: 'VovaTech Apex Ultra', star: 5, type: 'mb', cost: 30000, socket: 'DL5', memType: 'DDR8', slots: 16, spec: 'DL5 · DDR8 · 16 slots', desc: 'Absolute maximum platform' },
+      
+      { id: 'mb19', name: 'VovaTech Apex Omega', star: 6, type: 'mb', cost: 45000, socket: 'DL6', memType: 'DDR8', slots: 16, spec: 'DL6 · DDR8 · 16 slots', desc: 'True maximum platform & Quantum Computations' }
+    ],
+    cpu: [
+      { id: 'cpu1', name: 'CoreRush 4', star: 1, type: 'cpu', cost: 0, socket: 'AM3', hackBonus: 0, spec: 'AM3 · +0% hack', desc: 'Entry 4-core' },
+      { id: 'cpu2', name: 'CoreRush 8', star: 1, type: 'cpu', cost: 250, socket: 'AM3', hackBonus: 8, spec: 'AM3 · +8% hack', desc: 'Budget 8-core' },
+      
+      { id: 'cpu3', name: 'CoreRush 8', star: 1, type: 'cpu', cost: 400, socket: 'AM4', hackBonus: 12, spec: 'AM4 · +12% hack', desc: '8-core mid' },
+      { id: 'cpu4', name: 'CoreRush 12', star: 2, type: 'cpu', cost: 550, socket: 'AM4', hackBonus: 14, spec: 'AM4 · +14% hack', desc: '12-core mid' },
+
+      { id: 'cpu5', name: 'NexGen 12X', star: 2, type: 'cpu', cost: 700, socket: 'AM5', hackBonus: 20, spec: 'AM5 · +20% hack', desc: '12-core performer' },
+      { id: 'cpu6', name: 'NexGen 16X', star: 2, type: 'cpu', cost: 1300, socket: 'AM5', hackBonus: 26, spec: 'AM5 · +26% hack', desc: '16-core powerhouse' },
+
+      { id: 'cpu7', name: 'VoidCore Titan', star: 3, type: 'cpu', cost: 2000, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '16-core extreme' },
+      { id: 'cpu8', name: 'VoidCore Titan X2', star: 3, type: 'cpu', cost: 2500, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '32-core extreme' },
+
+      { id: 'cpu9', name: 'QuantaCore ZX-AM6-1', star: 3, type: 'cpu', cost: 3250, socket: 'AM6', hackBonus: 60, spec: 'AM6 · +60% hack', desc: '32-core next-gen' },
+      { id: 'cpu10', name: 'QuantaCore ZX-AM6-2', star: 4, type: 'cpu', cost: 4000, socket: 'AM6', hackBonus: 70, spec: 'AM6 · +70% hack', desc: '64-core net-gen' },
+
+      { id: 'cpu11', name: 'QuantaCore ZX-AM7-1', star: 4, type: 'cpu', cost: 5000, socket: 'AM7', hackBonus: 80, spec: 'AM7 · +80% hack', desc: '64-core hyper-gen' },
+      { id: 'cpu12', name: 'QuantaCore ZX-AM7-2', star: 4, type: 'cpu', cost: 6000, socket: 'AM7', hackBonus: 90, spec: 'AM7 · +90% hack', desc: '128-core hyper-gen' },
+
+      { id: 'cpu13', name: 'QuantaCore ZY-V1', star: 5, type: 'cpu', cost: 7500, socket: 'DL5', hackBonus: 100, spec: 'DL5 · +100% hack', desc: '128-core next-gen' },
+      { id: 'cpu14', name: 'QuantaCore ZY-V2', star: 5, type: 'cpu', cost: 10000, socket: 'DL5', hackBonus: 125, spec: 'DL5 · +125% hack', desc: '256-core hyper-gen' },
+
+      { id: 'cpu15', name: 'QuantaCore YZY-Quantum', star: 6, type: 'cpu', cost: 50000, socket: 'DL6', hackBonus: 250, spec: 'DL6 · +250% hack', desc: '512-core quantum-gen' },
+    ],
+    ram: [
+      { id: 'ram1', name: 'CoreBit 4GB DDR3', star: 1, type: 'ram', cost: 0, memType: 'DDR3', sticks: 2, nodeBonus: 0, spec: 'DDR3 · 1 stick · +0 nodes', desc: 'Legacy baseline' },
+      { id: 'ram2', name: 'SwiftMem 8GB DDR3', star: 1, type: 'ram', cost: 80, memType: 'DDR3', sticks: 2, nodeBonus: 2, spec: 'DDR3 · 2 sticks · +2 nodes', desc: 'Old dual channel' },
+
+      { id: 'ram3', name: 'CoreBit 8GB DDR4', star: 1, type: 'ram', cost: 120, memType: 'DDR4', sticks: 2, nodeBonus: 3, spec: 'DDR4 · 1 stick · +3 nodes', desc: 'Baseline DDR4' },
+      { id: 'ram4', name: 'CoreBit 16GB DDR4', star: 2, type: 'ram', cost: 220, memType: 'DDR4', sticks: 2, nodeBonus: 7, spec: 'DDR4 · 2 sticks · +7 nodes', desc: 'Reliable dual channel' },
+      { id: 'ram5', name: 'SwiftMem 32GB DDR4', star: 3, type: 'ram', cost: 400, memType: 'DDR4', sticks: 4, nodeBonus: 15, spec: 'DDR4 · 4 sticks · +15 nodes', desc: 'Performance quad channel' },
+
+      { id: 'ram6', name: 'CoreBit 32GB DDR5', star: 3, type: 'ram', cost: 550, memType: 'DDR5', sticks: 2, nodeBonus: 18, spec: 'DDR5 · 2 sticks · +18 nodes', desc: 'Fast DDR5 dual' },
+      { id: 'ram7', name: 'SwiftMem 64GB DDR5', star: 4, type: 'ram', cost: 950, memType: 'DDR5', sticks: 4, nodeBonus: 30, spec: 'DDR5 · 4 sticks · +30 nodes', desc: 'High bandwidth quad' },
+      { id: 'ram8', name: 'SwiftMem 128GB DDR5', star: 4, type: 'ram', cost: 1800, memType: 'DDR5', sticks: 8, nodeBonus: 48, spec: 'DDR5 · 8 sticks · +48 nodes', desc: 'Heavy workload DDR5' },
+
+      { id: 'ram9', name: 'CoreBit 64GB DDR6', star: 4, type: 'ram', cost: 2200, memType: 'DDR6', sticks: 2, nodeBonus: 40, spec: 'DDR6 · 2 sticks · +40 nodes', desc: 'Next-gen dual' },
+      { id: 'ram10', name: 'SwiftMem 128GB DDR6', star: 4, type: 'ram', cost: 4200, memType: 'DDR6', sticks: 4, nodeBonus: 75, spec: 'DDR6 · 4 sticks · +75 nodes', desc: 'Extreme quad' },
+      { id: 'ram11', name: 'OmegaRAM 256GB DDR6', star: 4, type: 'ram', cost: 7800, memType: 'DDR6', sticks: 8, nodeBonus: 130, spec: 'DDR6 · 8 sticks · +130 nodes', desc: 'Massive capacity' },
+
+      { id: 'ram12', name: 'OmegaRAM 128GB DDR7', star: 4, type: 'ram', cost: 8500, memType: 'DDR7', sticks: 4, nodeBonus: 160, spec: 'DDR7 · 4 sticks · +160 nodes', desc: 'Elite performance' },
+      { id: 'ram13', name: 'NovaTech 256GB DDR7', star: 5, type: 'ram', cost: 14000, memType: 'DDR7', sticks: 8, nodeBonus: 240, spec: 'DDR7 · 8 sticks · +240 nodes', desc: 'Ultra capacity' },
+
+      { id: 'ram14', name: 'OmegaRAM 512GB DDR8', star: 5, type: 'ram', cost: 20000, memType: 'DDR8', sticks: 8, nodeBonus: 320, spec: 'DDR8 · 8 sticks · +320 nodes', desc: 'Cutting-edge' },
+      { id: 'ram15', name: 'NovaTech 1TB DDR8', star: 5, type: 'ram', cost: 32000, memType: 'DDR8', sticks: 12, nodeBonus: 450, spec: 'DDR8 · 12 sticks · +450 nodes', desc: 'Server-grade monster' },
+      { id: 'ram16', name: 'NovaTech 2TB DDR8', star: 6, type: 'ram', cost: 50000, memType: 'DDR8', sticks: 16, nodeBonus: 700, spec: 'DDR8 · 16 sticks · +700 nodes', desc: 'Absolute maximum' },
+      { id: 'ram17', name: 'NovaTech 8TB DDR8', star: 6, type: 'ram', cost: 100000, memType: 'DDR8', sticks: 16, nodeBonus: 1000, spec: 'DDR8 · 16 sticks · +1000 nodes', desc: 'True Power' }
+    ],
+    net: [
+      { id: 'net1', name: 'NetLink 1G', star: 1, type: 'net', cost: 0, scanRange: 1, traceReduce: 0, spec: 'Range 1 · -0% trace', desc: 'Basic NIC' },
+      { id: 'net2', name: 'NetLink 10G', star: 2, type: 'net', cost: 300, scanRange: 2, traceReduce: 8, spec: 'Range 2 · -8% trace', desc: '10G NIC' },
+      { id: 'net3', name: 'PhantomNet 25G', star: 3, type: 'net', cost: 700, scanRange: 3, traceReduce: 18, spec: 'Range 3 · -18% trace', desc: 'Stealth NIC' },
+      { id: 'net4', name: 'PhantomNet 100G', star: 4, type: 'net', cost: 1500, scanRange: 4, traceReduce: 28, spec: 'Range 4 · -28% trace', desc: '100G pro NIC' },
+      { id: 'net5', name: 'PhantomNet Ghost', star: 5, type: 'net', cost: 3000, scanRange: 6, traceReduce: 40, spec: 'Range 6 · -40% trace', desc: 'Ultra-stealth NIC' },
+      { id: 'net6', name: 'PhantomNet Ghost V2', star: 5, type: 'net', cost: 3000, scanRange: 7, traceReduce: 50, spec: 'Range 7 · -50% trace', desc: 'Ultra-stealth NIC' },
+      { id: 'net7', name: 'PhantomNet Invisibility', star: 7, type: 'net', cost: 3000, scanRange: 10, traceReduce: 95, spec: 'Range 10 · -95% trace', desc: 'True-stealth Techonology' },
+    ],
+    gpu: [
+      /* Entry (1 Star) */
+      { id: 'gpu1', name: 'PixelForce 2600', star: 1, type: 'gpu', cost: 250, hackBonus: 2, spec: '+2% hack · CUDA crack', desc: 'Entry GPU' },
+      { id: 'gpu2', name: 'PixelForce 2900', star: 1, type: 'gpu', cost: 500, hackBonus: 4, spec: '+4% hack · parallel ops', desc: 'Entry GPU' },
+      { id: 'gpu3', name: 'PixelForce 3600', star: 1, type: 'gpu', cost: 800, hackBonus: 7, spec: '+7% hack · parallel ops', desc: 'Entry GPU' },
+
+      /* Mid (2-3 Star) */
+      { id: 'gpu4', name: 'PixelForce 4900', star: 2, type: 'gpu', cost: 1800, hackBonus: 15, spec: '+15% hack · tensor ops', desc: 'Mid GPU' },
+      { id: 'gpu5', name: 'PixelForce 5600', star: 2, type: 'gpu', cost: 2200, hackBonus: 18, spec: '+18% hack · tensor ops', desc: 'Mid GPU' },
+      { id: 'gpu6', name: 'PixelForce 5800', star: 3, type: 'gpu', cost: 2700, hackBonus: 24, spec: '+24% hack · tensor ops', desc: 'Mid GPU' },
+
+      /* High End (4-5 Star) */
+      { id: 'gpu7', name: 'PixelForce 7500', star: 4, type: 'gpu', cost: 3500, hackBonus: 30, spec: '+30% hack · AI brute', desc: 'HighEnd GPU' },
+      { id: 'gpu8', name: 'NovaTech 8090', star: 4, type: 'gpu', cost: 5000, hackBonus: 35, spec: '+35% hack · AI brute', desc: 'HighEnd GPU' },
+      { id: 'gpu9', name: 'NovaTech 9060', star: 5, type: 'gpu', cost: 7500, hackBonus: 40, spec: '+40% hack · AI brute', desc: 'Flagship GPU' },
+
+      /* WhY dId YoU bUy ThIs? (6 Star) */
+      { id: 'gpu10', name: 'NovaTech Universe X1', star: 6, type: 'gpu', cost: 10000, hackBonus: 50, spec: '+50% hack · WhY dId YoU bUy ThIs?', desc: 'Bragging Rights Level GPU' },
+    ],
+    };
+
+    const ALL_PARTS = Object.values(PARTS).flat();
+    const SLOT_TYPES = ['mb', 'cpu', 'ram', 'net', 'gpu'];
+
+    /* ═══════════════════════════════════════════════════
+       STATE
+    ═══════════════════════════════════════════════════ */
+    let cam = { x: 0, y: 0 }, zoom = 1, canvasW = 0, canvasH = 0;
+    let nodes = {}, nodeEls = {}, svgLines = {};
+    let currentNode = null, currentLocation = null;
+    let logLines = [], lootCDs = {};
+    // Per-node trace: {nodeId: {amount:0, lockedUntil:0}}
+    let nodeTraces = {};
+    let player = { money: 0, canScan: true };
+    // rig = what is currently installed on the PC
+    let rig = { mb: 'mb1', cpu: 'cpu1', ram: 'ram1', net: 'net1', gpu: null };
+    // inventory = all purchased parts (including what's installed)
+    let inventory = [...['mb1', 'cpu1', 'ram1', 'ram1', 'net1']]; // start with defaults
+    let shopTabCurrent = 'mb', shopSelected = null;
+    // Drag state
+    let panActive = false, panMoved = false, panStart = { x: 0, y: 0 }, camAtPanStart = { x: 0, y: 0 };
+    let nodeDrag = null, nodeDragOrigin = {}, nodeDragMoved = false;
+    // Builder drag
+    let builderDragPart = null;
+
+    /* ═══════════════════════════════════════════════════
+       RIG STATS
+    ═══════════════════════════════════════════════════ */
+    function getPart(id) { return ALL_PARTS.find(p => p.id === id); }
+    function getMB() { return getPart(rig.mb) || PARTS.mb[0]; }
+    function getCPU() { return getPart(rig.cpu) || PARTS.cpu[0]; }
+    function getRAM() { return getPart(rig.ram) || PARTS.ram[0]; }
+    function getNET() { return getPart(rig.net) || PARTS.net[0]; }
+    function getGPU() { return rig.gpu ? getPart(rig.gpu) : null; }
+
+    function getRigStats() {
+      const mb = getMB(), cpu = getCPU(), ram = getRAM(), net = getNET(), gpu = getGPU();
+      const effectiveSticks = Math.min(ram.sticks, mb.slots);
+      const nodeBonus = Math.round(ram.nodeBonus * (effectiveSticks / ram.sticks));
+      return {
+        maxNodes: 8 + nodeBonus,
+        hackBonus: cpu.hackBonus + (gpu ? gpu.hackBonus : 0),
+        scanRange: net.scanRange,
+        traceReduce: net.traceReduce,
+        mb,
+        cpu,
+        ram,
+        net,
+        gpu,
+        effectiveSticks
+      };
+    }
+
+    function hackChance(node) {
+      const { hackBonus } = getRigStats();
+      return Math.min(0.95, Math.max(0.05, 0.92 + hackBonus / 100 - (node.star - 1) * 0.20));
+    }
+    function hackPenalty(node) {
+      const base = [8, 12, 18, 26, 36][node.star - 1] || 15;
+      const { traceReduce } = getRigStats();
+      return Math.round(base * (1 - traceReduce / 100));
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PER-NODE TRACE
+    ═══════════════════════════════════════════════════ */
+    function getNodeTrace(nid) {
+      if (!nodeTraces[nid]) nodeTraces[nid] = { amount: 0, lockedUntil: 0 };
+      return nodeTraces[nid];
+    }
+    function isNodeLocked(nid) {
+      const t = getNodeTrace(nid);
+      return Date.now() < t.lockedUntil;
+    }
+    function isNodeOrNeighborLocked(n) {
+      return isNodeLocked(n.id);
+    }
+    function addNodeTrace(nid, amount) {
+      const t = getNodeTrace(nid);
+      t.amount = Math.min(100, t.amount + amount);
+      if (t.amount >= 100 && t.lockedUntil <= Date.now()) {
+        t.lockedUntil = Date.now() + NODE_LOCKOUT_MS;
+        addLog(`Node ${nid.slice(0, 4)} TRACED — locked 5 min`, 'var(--danger)');
+        updateNodeVisual(nid);
+      }
+    }
+    function lockoutRemaining(nid) {
+      const t = getNodeTrace(nid);
+      const rem = t.lockedUntil - Date.now();
+      return rem > 0 ? rem : 0;
+    }
+    function updateNodeVisual(nid) {
+      const el = nodeEls[nid]; if (!el) return;
+      const locked = isNodeLocked(nid);
+      const t = getNodeTrace(nid);
+      const circ = el.g.querySelector('circle[r="20"]');
+      if (circ) {
+        if (locked) circ.setAttribute('stroke', '#ff4444');
+        else if (t.amount > 60) circ.setAttribute('stroke', '#ffaa00');
+        else circ.setAttribute('stroke', el.col);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HELPERS
+    ═══════════════════════════════════════════════════ */
+    function guid() { return Math.random().toString(36).slice(2, 9).toUpperCase() }
+    function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a }
+    function clamp(v, a, b) { return Math.min(b, Math.max(a, v)) }
+    function w2s(wx, wy) { return { x: (wx - cam.x) * zoom, y: (wy - cam.y) * zoom }; }
+    function s2w(sx, sy) { return { x: sx / zoom + cam.x, y: sy / zoom + cam.y }; }
+    function getEvtPt(e) {
+      const r = document.getElementById('canvas-wrap').getBoundingClientRect();
+      const cl = e.touches ? e.touches[0] : e;
+      return { x: cl.clientX - r.left, y: cl.clientY - r.top };
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CANVAS / GRID
+    ═══════════════════════════════════════════════════ */
+    function initCanvas() {
+      const wrap = document.getElementById('canvas-wrap');
+      canvasW = wrap.clientWidth; canvasH = wrap.clientHeight;
+      const gc = document.getElementById('grid-canvas');
+      gc.width = canvasW; gc.height = canvasH;
+      cam.x = clamp(cam.x, 0, Math.max(0, WORLD_W - canvasW / zoom));
+      cam.y = clamp(cam.y, 0, Math.max(0, WORLD_H - canvasH / zoom));
+      drawGrid(); drawMinimap();
+    }
+    function drawGrid() {
+      const gc = document.getElementById('grid-canvas'), ctx = gc.getContext('2d');
+      ctx.clearRect(0, 0, canvasW, canvasH);
+      ctx.strokeStyle = '#0ff07'; ctx.lineWidth = .5;
+      const gs = 60 * zoom;
+      const ox = (-(cam.x * zoom % gs) + gs) % gs;
+      const oy = (-(cam.y * zoom % gs) + gs) % gs;
+      for (let x = ox; x < canvasW; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasH); ctx.stroke(); }
+      for (let y = oy; y < canvasH; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvasW, y); ctx.stroke(); }
+      ctx.strokeStyle = '#ff444466'; ctx.lineWidth = 2;
+      ctx.strokeRect(-cam.x * zoom, -cam.y * zoom, WORLD_W * zoom, WORLD_H * zoom);
+    }
+    function drawMinimap() {
+      const mc = document.getElementById('mm-canvas'), ctx = mc.getContext('2d');
+      const mw = 130, mh = 85;
+      ctx.clearRect(0, 0, mw, mh);
+      const sx = mw / WORLD_W, sy = mh / WORLD_H;
+      Object.values(nodes).forEach(n => {
+        if (!n.visible) return;
+        const col = n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : '#778899';
+        ctx.fillStyle = col + '99';
+        ctx.beginPath(); ctx.arc(n.wx * sx, n.wy * sy, 2.5, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.strokeStyle = '#ffd70066'; ctx.lineWidth = 1;
+      ctx.strokeRect(cam.x * sx, cam.y * sy, (canvasW / zoom) * sx, (canvasH / zoom) * sy);
+    }
+    function repositionAll() {
+      Object.values(nodes).forEach(n => {
+        if (!n.visible || !nodeEls[n.id]) return;
+        const s = w2s(n.wx, n.wy);
+        nodeEls[n.id].g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${zoom})`);
+      });
+      redrawLines();
+    }
+    function moveCam(nx, ny) {
+      cam.x = clamp(nx, 0, Math.max(0, WORLD_W - canvasW / zoom));
+      cam.y = clamp(ny, 0, Math.max(0, WORLD_H - canvasH / zoom));
+      repositionAll(); drawGrid(); drawMinimap();
+      if (currentNode) repositionPopup();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       NODES
+    ═══════════════════════════════════════════════════ */
+    function createNode(type, secured, wx, wy) {
+      const id = guid();
+      const classes = ['bank', 'house', 'store']
+      const deviceclasses = ['laptop', 'phone', 'tablet', 'server']
+      const randomIndex = type === 'network' ? rnd(1, classes.length) - 1 : type === 'device' ? rnd(1, deviceclasses.lenght) - 1: 0
+      const chosenclass = type === 'network' ? classes[randomIndex]: type === 'device' ? deviceclasses[randomIndex]: 'nothing i supose'
+
+      console.log('the class is ' + chosenclass)
+      const n = {
+        id, 
+        type, 
+        classification: chosenclass,
+        secured, 
+        reward: rnd(50, 200), 
+        connections: [],
+        scanned: false, 
+        hacked: type === 'home', 
+        loggedIn: type === 'home',
+        star: (()=>{ const r=Math.random(); return r<0.55?1:r<0.82?2:r<0.93?3:r<0.98?4:5; })(), 
+        wx, 
+        wy, 
+        visible: type !== 'device', 
+      };
+      nodes[id] = n;
+      nodeTraces[id] = { amount: 0, lockedUntil: 0 };
+      return n;
+    }
+    function connectNodes(a, b) { a.connections.push(b.id); b.connections.push(a.id); }
+
+    function renderNode(n) {
+      if (!n.visible) return;
+      const svg = document.getElementById('node-svg');
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      const s = w2s(n.wx, n.wy);
+      g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${zoom})`);
+      g.dataset.nid = n.id;
+      const col = n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : '#778899';
+      if (n.type === 'home') {
+        const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        ring.setAttribute('r', '28'); ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', '#00ff9640'); ring.setAttribute('stroke-width', '1');
+        const a1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        a1.setAttribute('attributeName', 'r'); a1.setAttribute('values', '24;38;24'); a1.setAttribute('dur', '3s'); a1.setAttribute('repeatCount', 'indefinite');
+        const a2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        a2.setAttribute('attributeName', 'opacity'); a2.setAttribute('values', '.5;0;.5'); a2.setAttribute('dur', '3s'); a2.setAttribute('repeatCount', 'indefinite');
+        ring.appendChild(a1); ring.appendChild(a2); g.appendChild(ring);
+      }
+
+      const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circ.setAttribute('r', '20'); circ.setAttribute('fill', col + '18'); circ.setAttribute('stroke', col); circ.setAttribute('stroke-width', '1.5');
+      g.appendChild(circ);
+      const locRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      locRing.setAttribute('r', '25'); locRing.setAttribute('fill', 'none');
+      locRing.setAttribute('stroke', '#ffd70099'); locRing.setAttribute('stroke-width', '1.5');
+      locRing.setAttribute('stroke-dasharray', '4 3');
+      locRing.style.display = currentLocation === n.id ? 'block' : 'none';
+      locRing.id = 'loc-' + n.id; g.appendChild(locRing);
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      icon.setAttribute('text-anchor', 'middle'); icon.setAttribute('dominant-baseline', 'central');
+      icon.setAttribute('fill', col); icon.setAttribute('font-size', '13');
+      icon.style.fontFamily = 'Share Tech Mono,monospace'; icon.style.pointerEvents = 'none';
+      icon.textContent = n.type === 'home' ? 'H' : n.type === 'network' ? 'N' : 'D'; 
+      // Add fancy node items
+      // alr bet
+
+      console.log('recived class: ' + n.classification)
+      switch (n.classification) {
+        case 'bank':   icon.textContent = '🏦'; break;
+        case 'house':  icon.textContent = '🏠'; break;
+        case 'store':  icon.textContent = '🏪'; break;
+        case 'laptop': icon.textContent = '💻'; break;
+        case 'phone':  icon.textContent = '📱'; break;
+        case 'tablet': icon.textContent = '📔'; break;
+        case 'server': icon.textContent = '🖥️'; break;
+      }
+
+      g.appendChild(icon);
+      const starsEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      starsEl.setAttribute('text-anchor', 'middle'); starsEl.setAttribute('y', '32');
+      starsEl.setAttribute('fill', '#ffd700'); starsEl.setAttribute('font-size', '9');
+      starsEl.style.pointerEvents = 'none'; starsEl.textContent = '*'.repeat(n.star);
+      g.appendChild(starsEl);
+      const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      badge.setAttribute('text-anchor', 'middle'); badge.setAttribute('y', '-28');
+      badge.setAttribute('fill', '#00ff96'); badge.setAttribute('font-size', '8');
+      badge.style.pointerEvents = 'none'; badge.id = 'bdg-' + n.id;
+      badge.style.display = (n.hacked && n.type !== 'home') ? 'block' : 'none';
+      if (n.hacked && n.type !== 'home') badge.textContent = 'OWN';
+      g.appendChild(badge);
+      g.style.cursor = 'grab';
+      g.addEventListener('mousedown', e => { e.stopPropagation(); startNodeDrag(e, n, g); });
+      g.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); startNodeDrag(e, n, g); }, { passive: false });
+      svg.appendChild(g);
+      g.style.opacity = '0';
+      setTimeout(() => { g.style.transition = 'opacity .35s'; g.style.opacity = '1'; }, 10);
+      nodeEls[n.id] = { g, col, locRing };
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LINES
+    ═══════════════════════════════════════════════════ */
+    function redrawLines() {
+      const svg = document.getElementById('node-svg');
+      Object.values(svgLines).forEach(l => { if (l.parentNode) l.parentNode.removeChild(l); });
+      svgLines = {};
+      const drawn = new Set();
+      Object.values(nodes).forEach(n => {
+        if (!n.visible || !nodeEls[n.id]) return;
+        n.connections.forEach(cid => {
+          const cn = nodes[cid]; if (!cn || !cn.visible || !nodeEls[cid]) return;
+          const key = [n.id, cid].sort().join('-');
+          if (drawn.has(key)) return; drawn.add(key);
+          const l = makeLine(n, cn); svg.insertBefore(l, svg.firstChild); svgLines[key] = l;
+        });
+      });
+    }
+    function makeLine(a, b) {
+      const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      posLine(l, a, b); l.setAttribute('stroke', '#0ff3'); l.setAttribute('stroke-width', '1');
+      l.setAttribute('stroke-dasharray', '4 4'); l._a = a.id; l._b = b.id;
+      const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+      anim.setAttribute('attributeName', 'stroke-dashoffset'); anim.setAttribute('values', '0;-16');
+      anim.setAttribute('dur', '1.2s'); anim.setAttribute('repeatCount', 'indefinite');
+      l.appendChild(anim); return l;
+    }
+    function posLine(l, a, b) {
+      const sa = w2s(a.wx, a.wy), sb = w2s(b.wx, b.wy);
+      l.setAttribute('x1', sa.x); l.setAttribute('y1', sa.y); l.setAttribute('x2', sb.x); l.setAttribute('y2', sb.y);
+    }
+    function addLineFor(a, b) {
+      const key = [a.id, b.id].sort().join('-'); if (svgLines[key]) return;
+      const svg = document.getElementById('node-svg');
+      const l = makeLine(a, b); svg.insertBefore(l, svg.firstChild); svgLines[key] = l;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DRAG — NODES
+    ═══════════════════════════════════════════════════ */
+    function startNodeDrag(e, n, g) {
+      const pt = getEvtPt(e);
+      nodeDrag = { n, g }; nodeDragOrigin = { px: pt.x, py: pt.y, wx: n.wx, wy: n.wy }; nodeDragMoved = false;
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    function onMove(e) {
+      if (nodeDrag) {
+        if (e.cancelable) e.preventDefault();
+        const pt = getEvtPt(e);
+        const dx = (pt.x - nodeDragOrigin.px) / zoom, dy = (pt.y - nodeDragOrigin.py) / zoom;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) nodeDragMoved = true;
+        if (nodeDragMoved) {
+          nodeDrag.n.wx = clamp(nodeDragOrigin.wx + dx, 20, WORLD_W - 20);
+          nodeDrag.n.wy = clamp(nodeDragOrigin.wy + dy, 20, WORLD_H - 20);
+          const s = w2s(nodeDrag.n.wx, nodeDrag.n.wy);
+          nodeDrag.g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${zoom})`);
+          const nid = nodeDrag.n.id;
+          Object.values(svgLines).forEach(l => { if (l._a === nid || l._b === nid) posLine(l, nodes[l._a], nodes[l._b]); });
+          drawMinimap(); if (currentNode && currentNode.id === nodeDrag.n.id) repositionPopup();
+        }
+        return;
+      }
+      if (panActive) {
+        if (e.cancelable) e.preventDefault();
+        const pt = getEvtPt(e);
+        const dx = (pt.x - panStart.x) / zoom, dy = (pt.y - panStart.y) / zoom;
+        if (Math.abs(pt.x - panStart.x) > 3 || Math.abs(pt.y - panStart.y) > 3) panMoved = true;
+        moveCam(camAtPanStart.x - dx, camAtPanStart.y - dy);
+      }
+    }
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchend', onUp);
+    function onUp() {
+      if (nodeDrag) { if (!nodeDragMoved) openPopup(nodeDrag.n, nodeDrag.g); nodeDrag = null; return; }
+      panActive = false;
+    }
+    const cwrap = document.getElementById('canvas-wrap');
+    function startPan(e) {
+      const tgt = e.target;
+      if (tgt === document.getElementById('node-svg') || tgt === document.getElementById('grid-canvas') || tgt === cwrap) {
+        closePopup(); panActive = true; panMoved = false;
+        panStart = getEvtPt(e); camAtPanStart = { x: cam.x, y: cam.y };
+      }
+    }
+    cwrap.addEventListener('mousedown', startPan);
+    cwrap.addEventListener('touchstart', e => startPan(e), { passive: false });
+
+    /* C: Mouse wheel zoom — zooms toward cursor position */
+    cwrap.addEventListener('wheel', e => {
+      e.preventDefault();
+      const pt = getEvtPt(e);
+      const worldX = pt.x / zoom + cam.x;
+      const worldY = pt.y / zoom + cam.y;
+      const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+      zoom = clamp(zoom * factor, 0.15, 4);
+      cam.x = clamp(worldX - pt.x / zoom, 0, Math.max(0, WORLD_W - canvasW / zoom));
+      cam.y = clamp(worldY - pt.y / zoom, 0, Math.max(0, WORLD_H - canvasH / zoom));
+      repositionAll(); drawGrid(); drawMinimap();
+      if (currentNode) repositionPopup();
+    }, { passive: false });
+
+    /* ═══════════════════════════════════════════════════
+       POPUP
+    ═══════════════════════════════════════════════════ */
+    function openPopup(n, g) { currentNode = n; document.getElementById('popup').style.display = 'block'; repositionPopup(); refreshPopup(); }
+    function repositionPopup() {
+      if (!currentNode) return;
+      const popup = document.getElementById('popup');
+      const s = w2s(currentNode.wx, currentNode.wy);
+      let px = s.x + 30, py = s.y - 10;
+      if (px + 230 > canvasW) px = s.x - 240;
+      py = clamp(py, 4, canvasH - 285); px = clamp(px, 4, canvasW - 230);
+      popup.style.left = px + 'px'; popup.style.top = py + 'px';
+    }
+    function closePopup() { document.getElementById('popup').style.display = 'none'; currentNode = null; }
+
+    function refreshPopup() {
+      if (!currentNode) return;
+      const n = currentNode;
+      const onNode = currentLocation === n.id;
+      const locked = isNodeLocked(n.id);
+      const t = getNodeTrace(n.id);
+      document.getElementById('pop-title').textContent = n.type.toUpperCase() + ' #' + n.id.slice(0, 4);
+      const parts = [];
+      if (n.hacked) parts.push('OWNED'); if (n.loggedIn) parts.push('LOGGED IN'); if (onNode) parts.push('HERE');
+      document.getElementById('pop-meta').textContent = `Reward: $${n.reward} · ${parts.join(' · ') || 'SECURED'}`;
+      const chance = Math.round(hackChance(n) * 100);
+      document.getElementById('pop-stars').textContent = '*'.repeat(n.star) + '·'.repeat(5 - n.star) + `  ${chance}% hack`;
+      document.getElementById('pop-trace-fill').style.width = t.amount + '%';
+      const lockoutEl = document.getElementById('pop-lockout');
+      if (locked) {
+        const rem = Math.ceil(lockoutRemaining(n.id) / 1000);
+        const mins = Math.floor(rem / 60), secs = rem % 60;
+        lockoutEl.textContent = `LOCKED OUT — ${mins}:${String(secs).padStart(2, '0')} remaining`;
+        lockoutEl.style.display = 'block';
+      } else lockoutEl.style.display = 'none';
+      const { maxNodes } = getRigStats();
+      const vis = Object.values(nodes).filter(x => x.visible).length;
+      const atLimit = vis >= maxNodes;
+      const blocked = locked;
+      document.getElementById('btn-scan').disabled = n.scanned || n.type === 'device' || !player.canScan || atLimit || blocked;
+      document.getElementById('btn-scan').textContent = locked ? '[ LOCKED ]' : n.scanned ? '[ SCANNED ]' : atLimit ? '[ NODE LIMIT ]' : '[ SCAN ]';
+      document.getElementById('btn-hack').disabled = n.hacked || blocked;
+      document.getElementById('btn-hack').textContent = locked ? '[ LOCKED ]' : n.hacked ? '[ OWNED ]' : `[ HACK (${chance}%) ]`;
+      const adj = isAdjacent(n);
+      document.getElementById('btn-login').disabled = !n.hacked || n.loggedIn || !adj || blocked;
+      document.getElementById('btn-login').textContent = locked ? '[ LOCKED ]' : n.loggedIn ? '[ LOGGED IN ]' : !n.hacked ? '[ HACK FIRST ]' : !adj ? '[ NOT ADJACENT ]' : '[ LOGIN ]';
+      const now = Date.now(), cdExp = lootCDs[n.id] || 0, onCD = now < cdExp;
+      const lootOk = n.loggedIn && onNode && !onCD && !blocked;
+      document.getElementById('btn-loot').disabled = !lootOk;
+      document.getElementById('btn-loot').textContent = locked ? '[ LOCKED ]' : !n.loggedIn ? '[ LOGIN FIRST ]' : !onNode ? '[ MUST BE HERE ]' : onCD ? `[ LOOT (${Math.ceil((cdExp - now) / 1000)}s) ]` : '[ LOOT ]';
+      document.getElementById('btn-remove').style.display = n.type === 'home' ? 'none' : 'block';
+    }
+
+    function isAdjacent(n) {
+      if (!currentLocation) return false;
+      const loc = nodes[currentLocation];
+      return loc && loc.loggedIn && (loc.connections.includes(n.id) || currentLocation === n.id);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       GAME ACTIONS
+    ═══════════════════════════════════════════════════ */
+    function doScan() {
+      if (!currentNode || currentNode.scanned || currentNode.type === 'device') return;
+      if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot scan — node locked', 'var(--danger)'); return; }
+      const { maxNodes } = getRigStats();
+      const vis = Object.values(nodes).filter(x => x.visible).length;
+      if (vis >= maxNodes) { addLog('Node limit reached — upgrade RAM', 'var(--warn)'); return; }
+      currentNode.scanned = true; player.canScan = false;
+      const nets = generateNetwork(currentNode, maxNodes - vis);
+      nets.forEach(n => { renderNode(n); addLineFor(currentNode, n); });
+      addLog(`Scanned: found ${nets.length} network(s)`, '#0096ff');
+      closePopup(); 
+      setTimeout(() => { player.canScan = true; }, 1200);
+      updateHUD(); 
+      drawMinimap();
+    }
+
+    function doHack() {
+      if (!currentNode || currentNode.hacked) return;
+      if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot hack — node locked', 'var(--danger)'); return; }
+      if (Math.random() < hackChance(currentNode)) {
+        currentNode.hacked = true;
+        const b = document.getElementById('bdg-' + currentNode.id);
+        if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
+        addLog(`Hacked ${currentNode.id.slice(0, 4)} (${currentNode.star}*)!`, 'var(--home)');
+      } else {
+        const pen = hackPenalty(currentNode);
+        addNodeTrace(currentNode.id, pen * 1.5);
+        addLog(`Hack failed — +${Math.round(pen * 1.5)} node trace (${currentNode.star}*)`, 'var(--danger)');
+        updateNodeVisual(currentNode.id);
+      }
+      updateHUD(); refreshPopup();
+    }
+
+    function hideOrphanedDevices(loggedOutNodeId) {
+      // Hide devices connected to loggedOutNodeId if they have no other logged-in parent network node
+      const parent = nodes[loggedOutNodeId]; if (!parent) return;
+      parent.connections.forEach(cid => {
+        const sub = nodes[cid];
+        if (!sub || sub.type !== 'device' || !sub.visible) return;
+        // Check if any other connected node is still logged in
+        const hasOtherParent = sub.connections.some(pid => pid !== loggedOutNodeId && nodes[pid] && nodes[pid].loggedIn);
+        if (!hasOtherParent) {
+          sub.visible = false;
+          if (nodeEls[sub.id]) { nodeEls[sub.id].g.remove(); delete nodeEls[sub.id]; }
+        }
+      });
+      redrawLines(); drawMinimap();
+    }
+
+    function hideSiblingDevices(deviceNode) {
+      deviceNode.connections.forEach(parentId => {
+        const parent = nodes[parentId];
+        if (!parent || parent.type !== 'network') return;
+        parent.connections.forEach(cid => {
+          if (cid === deviceNode.id) return;
+          const sib = nodes[cid];
+          if (!sib || sib.type !== 'device' || !sib.visible) return;
+          sib.visible = false;
+          if (nodeEls[sib.id]) { nodeEls[sib.id].g.remove(); delete nodeEls[sib.id]; }
+        });
+      });
+      redrawLines(); drawMinimap();
+    }
+
+    function doLogin() {
+      if (!currentNode || !currentNode.hacked || currentNode.loggedIn) return;
+      if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot login — node locked', 'var(--danger)'); return; }
+      if (!isAdjacent(currentNode)) { addLog('Must be on adjacent node to login', 'var(--warn)'); return; }
+      
+      Object.values(nodes).forEach(n => {
+        if (n.id !== currentNode.id && n.loggedIn && n.type !== 'home') {
+          n.loggedIn = false;
+          hideOrphanedDevices(n.id);
+          addLog(`Logged out of ${n.id.slice(0, 4)}`, 'var(--muted)');
+        }
+      });
+      currentNode.loggedIn = true; setLocation(currentNode.id);
+      
+      if (currentNode.type === 'device') {
+        currentNode.connections.forEach(parentId => {
+          const parent = nodes[parentId];
+          if (!parent || parent.type !== 'network') return;
+          parent.connections.forEach(sibId => {
+            if (sibId === currentNode.id) return;
+            const sib = nodes[sibId];
+            if (!sib || sib.type !== 'device' || !sib.visible) return;
+            sib.visible = false;
+            if (nodeEls[sib.id]) { nodeEls[sib.id].g.remove(); delete nodeEls[sib.id]; }
+          });
+        });
+        redrawLines(); drawMinimap();
+      } else {
+        
+        const { maxNodes } = getRigStats();
+        currentNode.connections.forEach(cid => {
+          const sub = nodes[cid];
+          if (sub && sub.type === 'device' && !sub.visible) {
+            const vis = Object.values(nodes).filter(x => x.visible).length;
+            if (vis < maxNodes) { sub.visible = true; renderNode(sub); addLineFor(currentNode, sub); }
+          }
+        });
+      }
+      addLog(`Logged into ${currentNode.id.slice(0, 4)}`, 'var(--home)');
+      refreshPopup(); updateHUD(); drawMinimap();
+    }
+
+    function doLoot() {
+      if (!currentNode || !currentNode.loggedIn || currentLocation !== currentNode.id) return;
+      if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot loot — node locked', 'var(--danger)'); return; }
+      const now = Date.now();
+      if (lootCDs[currentNode.id] && now < lootCDs[currentNode.id]) { addLog('Loot on cooldown', 'var(--warn)'); return; }
+      player.money += currentNode.reward; lootCDs[currentNode.id] = now + LOOT_CD;
+      addLog(`Looted $${currentNode.reward} from ${currentNode.id.slice(0, 4)}`, 'var(--gold)');
+      updateHUD();
+      const nid = currentNode.id;
+      const iv = setInterval(() => { if (Date.now() >= (lootCDs[nid] || 0)) clearInterval(iv); if (currentNode && currentNode.id === nid) refreshPopup(); }, 500);
+      refreshPopup();
+    }
+
+    function doRemove() {
+      if (!currentNode || currentNode.type === 'home') return;
+      const n = currentNode;
+      n.connections.forEach(cid => { const cn = nodes[cid]; if (!cn) return; cn.connections = cn.connections.filter(id => id !== n.id); });
+      if (nodeEls[n.id]) nodeEls[n.id].g.remove();
+      delete nodeEls[n.id]; delete nodes[n.id]; delete nodeTraces[n.id];
+      if (currentLocation === n.id) { const home = Object.values(nodes).find(x => x.type === 'home'); if (home) setLocation(home.id); }
+      redrawLines(); closePopup();
+      addLog(`Removed node ${n.id.slice(0, 4)}`, 'var(--muted)');
+      updateHUD(); drawMinimap();
+    }
+
+    function setLocation(nid) {
+      const prev = currentLocation;
+      if (prev && nodeEls[prev]) { const el = document.getElementById('loc-' + prev); if (el) el.style.display = 'none'; }
+      currentLocation = nid;
+      if (nodeEls[nid]) { const el = document.getElementById('loc-' + nid); if (el) el.style.display = 'block'; }
+    }
+
+    function generateNetwork(origin, budget) {
+      const r = 185; 
+      const count = origin.name === "home"? 1: clamp(rnd(2, 4), 1, budget); 
+      const nets = [];
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+        const wx = clamp(origin.wx + Math.cos(angle) * r, 20, WORLD_W - 20);
+        const wy = clamp(origin.wy + Math.sin(angle) * r, 20, WORLD_H - 20);
+        const net = createNode('network', true, wx, wy); connectNodes(origin, net);
+        for (let j = 0; j < rnd(1, 3); j++) {
+          const da = angle + (j - 1) * 0.45;
+          const dev = createNode('device', true, clamp(wx + Math.cos(da) * 90, 20, WORLD_W - 20), clamp(wy + Math.sin(da) * 90, 20, WORLD_H - 20));
+          connectNodes(net, dev);
+        }
+        nets.push(net);
+      }
+      return nets;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LOCKOUT TICK (every second, refresh locked nodes)
+    ═══════════════════════════════════════════════════ */
+    setInterval(() => {
+      let changed = false;
+      Object.keys(nodeTraces).forEach(nid => {
+        const t = nodeTraces[nid];
+        if (t.lockedUntil > 0 && Date.now() >= t.lockedUntil && Date.now() < t.lockedUntil + 2000) {
+          t.lockedUntil = 0; t.amount = 0; changed = true;
+          updateNodeVisual(nid);
+          addLog(`Node ${nid.slice(0, 4)} trace cleared`, 'var(--home)');
+        }
+      });
+      if (changed && currentNode) refreshPopup();
+      if (currentNode && isNodeLocked(currentNode.id)) refreshPopup();
+    }, 1000);
+
+    /* ═══════════════════════════════════════════════════
+       SHOP
+    ═══════════════════════════════════════════════════ */
+    function openShop() {
+      shopSelected = null;
+      document.getElementById('shop-modal').style.display = 'flex';
+      renderShop();
+    }
+    function closeShop() { document.getElementById('shop-modal').style.display = 'none'; shopSelected = null; }
+    function shopTabClick(t, btn) {
+      shopTabCurrent = t; shopSelected = null;
+      document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); renderShop();
+    }
+
+    function getCompatNote(p) {
+      const mb = getMB();
+      if (p.type === 'cpu' && p.socket !== mb.socket) return `⚠ needs ${p.socket} board`;
+      if (p.type === 'ram' && p.memType !== mb.memType) return `⚠ needs ${p.memType} board`;
+      if (p.type === 'ram' && p.sticks > mb.slots) return `⚠ needs ${p.sticks}-slot board`;
+      return null;
+    }
+
+    function renderShop() {
+      const s = getRigStats();
+      const invCount = id => inventory.filter(x => x === id).length;
+      document.getElementById('rig-summary').innerHTML =
+        `<b style="color:var(--text)">Active rig:</b> ${s.mb.name} · ${s.cpu.name} · ` +
+        `${s.ram.name} (${s.effectiveSticks}/${s.ram.sticks}) · ${s.net.name}` +
+        (s.gpu ? ` · ${s.gpu.name}` : '') +
+        `<br><span style="color:var(--text)">Nodes: ${s.maxNodes}</span> · ` +
+        `<span style="color:var(--text)">Hack: +${s.hackBonus}%</span> · ` +
+        `<span style="color:var(--text)">Scan: ${s.scanRange}</span> · ` +
+        `<span style="color:var(--text)">Trace reduce: ${s.traceReduce}%</span>`;
+      const parts = PARTS[shopTabCurrent];
+      const grid = document.getElementById('parts-grid'); grid.innerHTML = '';
+      parts.forEach(p => {
+        const cnt = invCount(p.id);
+        const note = getCompatNote(p);
+        const card = document.createElement('div');
+        let cls = 'part-card';
+        if (shopSelected === p.id) cls += ' selected';
+        if (cnt > 0) cls += ' is-owned-inv';
+        card.className = cls;
+        const badge = cnt > 0 ? `<div class="inv-tag">IN INVENTORY (x${cnt})</div>` : '';
+        card.innerHTML = badge +
+          `<div class="part-name">${p.name}</div>` +
+          `<div class="part-type-lbl">${p.type.toUpperCase()} · ${p.desc}</div>` +
+          `<div class="part-stars">${'★'.repeat(Math.min(p.star,6))}${'☆'.repeat(Math.max(0,5 - p.star))}</div>` +
+          `<div class="part-spec">${p.spec}</div>` +
+          (note ? `<div class="incompat-reason">${note}</div>` : '') +
+          `<div class="part-cost">${p.cost === 0 ? 'FREE' : '$' + p.cost}</div>`;
+        card.onclick = () => { shopSelected = p.id; renderShop(); };
+        grid.appendChild(card);
+      });
+      document.getElementById('shop-buy').disabled = !shopSelected;
+      document.getElementById('shop-status').textContent = '';
+    }
+
+    function buySelected() {
+      if (!shopSelected) return;
+      const p = ALL_PARTS.find(x => x.id === shopSelected); if (!p) return;
+      if (player.money < p.cost) { document.getElementById('shop-status').textContent = 'Insufficient funds'; addLog('Insufficient funds', 'var(--warn)'); return; }
+      player.money -= p.cost;
+      inventory.push(p.id);
+      shopSelected = null;
+      addLog(`Purchased: ${p.name}`, 'var(--gold)');
+      updateHUD(); 
+      renderShop(); 
+      renderBuilderInv();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PC BUILDER
+    ═══════════════════════════════════════════════════ */
+    // pending rig = what's being assembled in builder (not yet committed)
+    let pendingRig = { mb: null, cpu: null, ram: null, net: null, gpu: null };
+
+    function openBuilder() {
+      // Clone current rig as pending
+      pendingRig = { ...rig };
+      document.getElementById('builder-modal').style.display = 'flex';
+      renderBuilder();
+    }
+    function closeBuilder() { document.getElementById('builder-modal').style.display = 'none'; }
+
+    function renderBuilder() {
+      renderBuilderSlots();
+      renderBuilderInv();
+      renderBuilderStats();
+    }
+
+    const SLOT_LABELS = { mb: 'Motherboard', cpu: 'CPU', ram: 'RAM', net: 'NIC', gpu: 'GPU (opt.)' };
+
+    function renderBuilderSlots() {
+      const container = document.getElementById('builder-slots');
+      container.innerHTML = '';
+      SLOT_TYPES.forEach(slotType => {
+        const row = document.createElement('div'); row.className = 'slot-row';
+        const lbl = document.createElement('div'); lbl.className = 'slot-label'; lbl.textContent = SLOT_LABELS[slotType];
+        const drop = document.createElement('div');
+        drop.className = 'slot-drop'; drop.dataset.slot = slotType;
+        const installedId = pendingRig[slotType];
+        const part = installedId ? getPart(installedId) : null;
+        if (part) {
+          drop.classList.add('filled');
+          drop.innerHTML = `<div><div class="slot-part-name">${part.name}</div><div class="slot-part-spec">${part.spec}</div></div>` +
+            `<span class="slot-stars">${'★'.repeat(part.star)}</span>` +
+            `<span class="slot-remove" onclick="removeFromSlot('${slotType}')">✕</span>`;
+        } else {
+          drop.innerHTML = `<span class="slot-empty">[ drag part here ]</span>`;
+        }
+        drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+        drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+        drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag-over'); dropPartInSlot(slotType, e.dataTransfer.getData('text')); });
+        row.appendChild(lbl); row.appendChild(drop); container.appendChild(row);
+      });
+    }
+
+    function removeFromSlot(slotType) {
+      if (slotType === 'mb') { pendingRig.cpu = null; pendingRig.ram = null; }// clearing MB clears incompatible
+      pendingRig[slotType] = null;
+      renderBuilder();
+    }
+
+    function dropPartInSlot(slotType, partId) {
+      const p = getPart(partId); if (!p) return;
+      if (p.type !== slotType) {
+        document.getElementById('builder-status').textContent = `That part goes in the ${p.type.toUpperCase()} slot`;
+        setTimeout(() => document.getElementById('builder-status').textContent = '', 2000); return;
+      }
+
+      const mb = pendingRig.mb ? getPart(pendingRig.mb) : null;
+      if (mb) {
+        if (p.type === 'cpu' && p.socket !== mb.socket) {
+          document.getElementById('builder-status').textContent = `✗ CPU socket ${p.socket} incompatible with ${mb.socket} board`;
+          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
+        }
+        if (p.type === 'ram' && p.memType !== mb.memType) {
+          document.getElementById('builder-status').textContent = `✗ ${p.memType} RAM incompatible with ${mb.memType} board`;
+          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
+        }
+        if (p.type === 'ram' && p.sticks > mb.slots) {
+          document.getElementById('builder-status').textContent = `✗ RAM needs ${p.sticks} slots, board only has ${mb.slots}`;
+          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
+        }
+      }
+      if (!mb && (p.type === 'cpu' || p.type === 'ram')) {
+        document.getElementById('builder-status').textContent = `✗ Install a motherboard first`;
+        setTimeout(() => document.getElementById('builder-status').textContent = '', 2000); return;
+      }
+      // If placing MB, clear incompatible parts
+      if (p.type === 'mb') {
+        const curCPU = pendingRig.cpu ? getPart(pendingRig.cpu) : null;
+        const curRAM = pendingRig.ram ? getPart(pendingRig.ram) : null;
+        if (curCPU && curCPU.socket !== p.socket) pendingRig.cpu = null;
+        if (curRAM && (curRAM.memType !== p.memType || curRAM.sticks > p.slots)) pendingRig.ram = null;
+      }
+      pendingRig[slotType] = partId;
+      // Apply pending rig to live rig
+      if (pendingRig.mb && pendingRig.cpu && pendingRig.ram && pendingRig.net) {
+        rig = { ...pendingRig };
+        addLog(`Rig updated: ${getPart(rig.mb).name}`, 'var(--home)');
+        updateHUD();
+      }
+      renderBuilder();
+    }
+
+    function renderBuilderInv() {
+      const list = document.getElementById('inv-list'); if (!list) return;
+      list.innerHTML = '';
+      // Deduplicate by id but show count
+      const counts = {};
+      inventory.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+      const shown = new Set();
+      inventory.forEach(id => {
+        if (shown.has(id)) return; shown.add(id);
+        const p = getPart(id); if (!p) return;
+        const item = document.createElement('div'); item.className = 'inv-item';
+        item.draggable = true;
+        item.innerHTML = `<div class="inv-item-name">${p.name}${counts[id] > 1 ? ` <span style="color:var(--muted);font-size:9px">x${counts[id]}</span>` : ''}</div>` +
+          `<div class="inv-item-stars">${'★'.repeat(p.star)}</div>` +
+          `<div class="inv-item-sub">${p.spec}</div>`;
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text', id); item.classList.add('dragging'); builderDragPart = id;
+        });
+        item.addEventListener('dragend', () => { item.classList.remove('dragging'); builderDragPart = null; });
+        list.appendChild(item);
+      });
+      if (list.children.length === 0) {
+        list.innerHTML = '<div style="font-size:10px;color:var(--muted);font-family:var(--mono);padding:8px">No parts in inventory.<br>Purchase parts from the shop.</div>';
+      }
+    }
+
+    function renderBuilderStats() {
+      const el = document.getElementById('builder-stats');
+      // Temporarily set rig to pending to calculate stats
+      const savedRig = { ...rig };
+      if (pendingRig.mb && pendingRig.cpu && pendingRig.ram && pendingRig.net) {
+        rig = { ...pendingRig };
+      }
+      const s = getRigStats();
+      rig = { ...savedRig };
+      // Compat issues
+      const issues = [];
+      const pmb = pendingRig.mb ? getPart(pendingRig.mb) : null;
+      const pcpu = pendingRig.cpu ? getPart(pendingRig.cpu) : null;
+      const pram = pendingRig.ram ? getPart(pendingRig.ram) : null;
+      if (pmb && pcpu && pcpu.socket !== pmb.socket) issues.push(`CPU socket mismatch (${pcpu.socket} vs ${pmb.socket})`);
+      if (pmb && pram && pram.memType !== pmb.memType) issues.push(`RAM type mismatch (${pram.memType} vs ${pmb.memType})`);
+      if (pmb && pram && pram.sticks > pmb.slots) issues.push(`Not enough RAM slots (${pram.sticks} needed, ${pmb.slots} available)`);
+      el.innerHTML = `<h3>[ ACTIVE RIG STATS ]</h3>` +
+        `<div class="bstat-row"><span class="bstat-label">Max nodes</span><span class="bstat-val good">${s.maxNodes}</span></div>` +
+        `<div class="bstat-row"><span class="bstat-label">Hack bonus</span><span class="bstat-val good">+${s.hackBonus}%</span></div>` +
+        `<div class="bstat-row"><span class="bstat-label">Scan range</span><span class="bstat-val">${s.scanRange}</span></div>` +
+        `<div class="bstat-row"><span class="bstat-label">Trace reduce</span><span class="bstat-val">-${s.traceReduce}%</span></div>` +
+        (issues.length ? `<div class="compat-msg">⚠ ${issues.join('<br>⚠ ')}</div>` : '');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HUD
+    ═══════════════════════════════════════════════════ */
+    function updateHUD() {
+      document.getElementById('money-val').textContent = '$' + player.money;
+      const s = getRigStats();
+      const vis = Object.values(nodes).filter(n => n.visible).length;
+      document.getElementById('nodes-val').textContent = vis + '/' + s.maxNodes;
+      document.getElementById('hack-val').textContent = '+' + s.hackBonus + '%';
+    }
+    function addLog(msg, color = 'var(--muted)') {
+      const log = document.getElementById('log');
+      const el = document.createElement('div'); el.className = 'log-line'; el.style.color = color; el.textContent = '> ' + msg;
+      log.insertBefore(el, log.firstChild); logLines.push(el);
+      if (logLines.length > 7) log.removeChild(logLines.shift());
+    }
+    function shakeEl(el) { el.style.transform = 'translateX(-3px)'; setTimeout(() => el.style.transform = 'translateX(3px)', 70); setTimeout(() => el.style.transform = 'none', 140); }
+    function triggerGameOver() { setTimeout(() => { closePopup(); document.getElementById('gameover').style.display = 'flex'; }, 500); }
+
+    /* ═══════════════════════════════════════════════════
+       SAVE / LOAD
+    ═══════════════════════════════════════════════════ */
+    function buildSaveData() {
+      return JSON.stringify({
+        v: 3, player, rig, inventory, cam, zoom,
+        nodes: Object.values(nodes).map(n => ({ ...n })),
+        nodeTraces, lootCDs, currentLocation,
+      });
+    }
+    function saveGame() {
+      try { localStorage.setItem('netrun_save', buildSaveData()); showToast('Game saved.'); }
+      catch (e) {
+        // Fallback: download file
+        const blob = new Blob([buildSaveData()], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'netrun_save.json'; a.click(); showToast('Saved to file.');
+      }
+    }
+    function loadGame() {
+      const stored = localStorage.getItem('netrun_save');
+      if (stored) { applyLoad(stored); showToast('Game loaded.'); }
+      else {
+        const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json';
+        inp.onchange = e => {
+          const f = e.target.files[0]; if (!f) return;
+          const reader = new FileReader();
+          reader.onload = ev => { applyLoad(ev.target.result); showToast('Loaded from file.'); };
+          reader.readAsText(f);
+        };
+        inp.click();
+      }
+    }
+    function applyLoad(json) {
+      try {
+        const d = JSON.parse(json);
+        nodes = {}; nodeEls = {}; svgLines = {}; currentNode = null; logLines = [];
+        player = d.player; rig = d.rig; inventory = d.inventory || [];
+        cam = d.cam || { x: 0, y: 0 }; zoom = d.zoom || 1; nodeTraces = d.nodeTraces || {}; lootCDs = d.lootCDs || {};
+        const svg = document.getElementById('node-svg');
+        svg.innerHTML = '<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0ff6" stroke-width="1.5" stroke-linecap="round"/></marker></defs>';
+        document.getElementById('gameover').style.display = 'none'; closePopup();
+        d.nodes.forEach(n => { nodes[n.id] = n; });
+        currentLocation = d.currentLocation;
+        Object.values(nodes).forEach(n => { if (n.visible) renderNode(n); });
+        // Redraw location ring
+        if (currentLocation && nodeEls[currentLocation]) {
+          const el = document.getElementById('loc-' + currentLocation); if (el) el.style.display = 'block';
+        }
+        redrawLines(); initCanvas(); drawGrid(); drawMinimap(); updateHUD();
+        Object.keys(nodeTraces).forEach(nid => updateNodeVisual(nid));
+        addLog('Game loaded.', 'var(--home)');
+      } catch (e) { addLog('Load failed: ' + e.message, 'var(--danger)'); }
+    }
+    function showToast(msg) {
+      const t = document.getElementById('save-toast'); t.textContent = msg;
+      t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 1800);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════════════════ */
+    function resetGame() { initGame(); }
+    function initGame() {
+      nodes = {}; nodeEls = {}; svgLines = {}; currentNode = null; currentLocation = null;
+      lootCDs = {}; nodeTraces = {}; logLines = []; zoom = 1;
+      player = { money: 0, canScan: true };
+      rig = { mb: 'mb1', cpu: 'cpu1', ram: 'ram1', net: 'net1', gpu: null };
+      inventory = ['mb1', 'cpu1', 'ram1', 'net1'];
+      shopSelected = null;
+      const svg = document.getElementById('node-svg');
+      svg.innerHTML = '<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0ff6" stroke-width="1.5" stroke-linecap="round"/></marker></defs>';
+      document.getElementById('shop-modal').style.display = 'none';
+      document.getElementById('builder-modal').style.display = 'none';
+      closePopup();
+      cam = { x: clamp(WORLD_W / 2 - canvasW / 2, 0, WORLD_W - canvasW), y: clamp(WORLD_H / 2 - canvasH / 2, 0, WORLD_H - canvasH) };
+      const home = createNode('home', false, WORLD_W / 2, WORLD_H / 2);
+      currentLocation = home.id; renderNode(home);
+      drawGrid(); drawMinimap(); updateHUD();
+      addLog('System boot — home node online.', 'var(--home)');
+      addLog('[ BUILD RIG ] to configure hardware', 'var(--muted)');
+    }
+    window.addEventListener('resize', () => { initCanvas(); repositionAll(); if (currentNode) repositionPopup(); });
+    initCanvas(); initGame();
+
+    /* ── CONSOLE COMMANDS ── */
+    window.diddy = {
+      help() {
+        console.log([
+          'diddy.money(n)       — set credits',
+          'diddy.trace(n)       — set node trace on selected node (0-100)',
+          'diddy.clearTrace()   — clear all node traces and lockouts',
+          'diddy.hackAll()      — hack every visible node',
+          'diddy.revealAll()    — reveal all scanned networks',
+          'diddy.unlockAll()    — clear all lockouts',
+          'diddy.addPart(id)    — add a part to inventory by id',
+          'diddy.listParts()    — list all part ids',
+          'diddy.zoom(n)        — set zoom level (0.15 – 4)',
+          'diddy.god()          — max money + hack everything',
+        ].join('\n'));
+      },
+      money(n) {
+        player.money = n; updateHUD();
+        console.log(`Credits set to $${n}`);
+      },
+      trace(n) {
+        if (!currentNode) { console.warn('Open a node popup first'); return; }
+        addNodeTrace(currentNode.id, n - getNodeTrace(currentNode.id).amount);
+        updateNodeVisual(currentNode.id); refreshPopup();
+        console.log(`Node ${currentNode.id} trace set to ${n}`);
+      },
+      clearTrace() {
+        Object.keys(nodeTraces).forEach(nid => {
+          nodeTraces[nid] = { amount: 0, lockedUntil: 0 };
+          updateNodeVisual(nid);
+        });
+        if (currentNode) refreshPopup();
+        console.log('All traces cleared');
+      },
+      hackAll() {
+        Object.values(nodes).forEach(n => {
+          if (!n.hacked) {
+            n.hacked = true;
+            const b = document.getElementById('bdg-' + n.id);
+            if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
+          }
+        });
+        if (currentNode) refreshPopup();
+        console.log('All nodes hacked');
+      },
+      revealAll() {
+        Object.values(nodes).forEach(n => {
+          if (!n.scanned && n.type !== 'device') {
+            n.scanned = true;
+            const nets = generateNetwork(n, 99);
+            nets.forEach(net => { renderNode(net); addLineFor(n, net); });
+          }
+        });
+        updateHUD(); drawMinimap();
+        console.log('All nodes scanned');
+      },
+      unlockAll() {
+        Object.keys(nodeTraces).forEach(nid => {
+          nodeTraces[nid].lockedUntil = 0;
+          updateNodeVisual(nid);
+        });
+        if (currentNode) refreshPopup();
+        console.log('All lockouts cleared');
+      },
+      addPart(id) {
+        const p = getPart(id);
+        if (!p) { console.warn('Unknown part id:', id); return; }
+        inventory.push(id);
+        renderBuilderInv();
+        console.log(`Added ${p.name} to inventory`);
+      },
+      listParts() {
+        ALL_PARTS.forEach(p => console.log(`${p.id.padEnd(8)} ${p.type.padEnd(4)} ${p.name}`));
+      },
+      zoom(n) {
+        zoom = clamp(n, 0.15, 4);
+        repositionAll(); drawGrid(); drawMinimap();
+        console.log(`Zoom set to ${n}`);
+      },
+      god() {
+        player.money = 999999; updateHUD();
+        this.hackAll();
+        this.clearTrace();
+        console.log('God mode enabled');
+      },
+    };
+  </script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -813,6 +813,217 @@
       border-radius: 2px
     }
 
+    /* Hacking tools inventory bar */
+    #tools-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 15;
+      pointer-events: all;
+    }
+    .tool-slot {
+      width: 44px; height: 44px;
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+      position: relative; font-family: var(--mono);
+    }
+    .tool-slot:hover { border-color: var(--home); background: var(--panel2); }
+    .tool-slot.active-tool { border-color: var(--home); background: #00ff9618; box-shadow: 0 0 8px #00ff9633; }
+    .tool-slot.empty { opacity: .3; cursor: default; }
+    .tool-icon { font-size: 18px; line-height: 1; }
+    .tool-count { font-size: 8px; color: var(--gold); position: absolute; bottom: 3px; right: 5px; }
+    .tool-key { font-size: 8px; color: var(--muted); position: absolute; top: 2px; left: 4px; }
+
+    /* Boss (6-star) node glow */
+    .boss-ring { animation: bossGlow 1.5s ease-in-out infinite alternate; }
+    @keyframes bossGlow { from { opacity: .4; } to { opacity: 1; } }
+
+    /* Minigame overlay */
+    #minigame-overlay {
+      position: absolute; inset: 0; background: #000d;
+      z-index: 50; display: none;
+      align-items: center; justify-content: center;
+    }
+    #minigame-box {
+      background: var(--panel);
+      border: 1px solid var(--danger);
+      border-radius: 8px;
+      padding: 20px; width: min(520px, 96%);
+      font-family: var(--mono);
+    }
+    #minigame-box h2 { font-size: 14px; color: var(--danger); letter-spacing: .15em; margin-bottom: 4px; }
+    #mg-desc { font-size: 10px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+    #mg-timer-wrap { width: 100%; height: 6px; background: #1a0808; border: 1px solid #ff44442a; border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+    #mg-timer-fill { height: 100%; background: linear-gradient(90deg, var(--home), var(--warn), var(--danger)); transition: width .1s linear; }
+    /* Sequence game */
+    #mg-sequence-area { display: none; }
+    .seq-display { font-size: 22px; letter-spacing: .3em; color: var(--home); text-align: center; margin: 10px 0; min-height: 36px; font-family: var(--mono); }
+    .seq-input-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+    .seq-key { width: 36px; height: 36px; background: transparent; border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 13px; border-radius: 4px; cursor: pointer; transition: all .1s; }
+    .seq-key:hover { background: #0ff1; border-color: #0ff; }
+    .seq-key.correct { border-color: var(--home); color: var(--home); background: #00ff9620; }
+    .seq-key.wrong { border-color: var(--danger); color: var(--danger); background: #ff44441a; }
+    /* Firewall game */
+    #mg-firewall-area { display: none; }
+    #fw-grid { display: grid; gap: 4px; margin: 10px auto; width: fit-content; }
+    .fw-cell { width: 38px; height: 38px; border: 1px solid var(--border2); border-radius: 3px; background: var(--panel2); cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); }
+    .fw-cell:hover { border-color: #0ff8; }
+    .fw-cell.path { background: #0096ff33; border-color: var(--net); color: var(--net); }
+    .fw-cell.blocked { background: #ff44441a; border-color: var(--danger); color: var(--danger); cursor: not-allowed; }
+    .fw-cell.start { background: #00ff9633; border-color: var(--home); color: var(--home); }
+    .fw-cell.end { background: #ffd70033; border-color: var(--gold); color: var(--gold); }
+    .fw-cell.selected { background: #0096ff55; border-color: var(--net); }
+    /* Decrypt game */
+    #mg-decrypt-area { display: none; }
+    .decrypt-pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+    .decrypt-card { background: var(--panel2); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; cursor: pointer; text-align: center; font-size: 12px; transition: all .15s; }
+    .decrypt-card:hover { border-color: var(--border2); }
+    .decrypt-card.flipped { border-color: var(--net); color: var(--net); background: #0096ff18; }
+    .decrypt-card.matched { border-color: var(--home); color: var(--home); background: #00ff9618; cursor: default; }
+    .decrypt-card.wrong-flip { border-color: var(--danger); background: #ff44441a; animation: shake .3s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+    #mg-tool-select { margin-bottom: 12px; }
+    #mg-tool-select p { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+    .mg-tool-btn { background: transparent; border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 11px; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 3px; transition: all .15s; }
+    .mg-tool-btn:hover:not(:disabled) { background: #0ff1; border-color: #0ff; }
+    .mg-tool-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .mg-tool-btn.selected-tool { border-color: var(--home); color: var(--home); background: #00ff9618; }
+    #mg-start-btn { display: block; width: 100%; margin-top: 12px; padding: 8px; background: transparent; border: 1px solid var(--home); color: var(--home); font-family: var(--mono); font-size: 12px; border-radius: 4px; cursor: pointer; transition: all .15s; letter-spacing: .1em; }
+    #mg-start-btn:hover { background: #00ff9618; }
+    #mg-start-btn:disabled { opacity: .35; cursor: not-allowed; }
+    #mg-result { text-align: center; font-size: 13px; padding: 10px; display: none; }
+    #mg-close-btn { display: block; width: 100%; margin-top: 8px; padding: 6px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: var(--mono); font-size: 11px; border-radius: 4px; cursor: pointer; }
+
+    /* ── SKILL TREE ── */
+    #skilltree-overlay {
+      position: absolute; inset: 0; background: #000c; z-index: 35;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    #skilltree-box {
+      background: var(--panel); border: 1px solid var(--border2);
+      border-radius: 8px; width: min(820px,100%); max-height: calc(100vh - 40px);
+      overflow-y: auto; padding: 18px; font-family: var(--ui);
+    }
+    #skilltree-box h2 { font-size: 15px; font-weight: 600; color: var(--home); margin-bottom: 4px; }
+    .sk-xp-bar-wrap { width: 100%; height: 6px; background: #0a1a0a; border: 1px solid #00ff9622; border-radius: 3px; margin-bottom: 14px; overflow: hidden; }
+    .sk-xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--home), #00cc77); transition: width .4s; }
+    .sk-branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .sk-branch { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+    .sk-branch-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+    .sk-branch.stealth .sk-branch-title { color: #00bfff; }
+    .sk-branch.brute .sk-branch-title { color: var(--danger); }
+    .sk-branch.efficiency .sk-branch-title { color: var(--gold); }
+    .sk-node-row { display: flex; flex-direction: column; gap: 6px; }
+    .sk-node {
+      border: 1px solid var(--border); border-radius: 5px; padding: 9px 10px;
+      cursor: pointer; transition: all .15s; position: relative; background: var(--panel);
+    }
+    .sk-node:hover:not(.sk-locked):not(.sk-maxed) { border-color: var(--border2); background: var(--panel3); }
+    .sk-node.sk-unlocked { border-color: rgba(0,255,150,.4); background: #00ff9608; }
+    .sk-node.sk-maxed { border-color: var(--home); background: #00ff9615; }
+    .sk-node.sk-locked { opacity: .38; cursor: not-allowed; }
+    .sk-node-name { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .sk-node-desc { font-size: 9px; color: var(--muted); line-height: 1.5; }
+    .sk-node-cost { font-size: 9px; color: var(--gold); margin-top: 4px; font-family: var(--mono); }
+    .sk-node-rank { position: absolute; top: 7px; right: 8px; font-size: 9px; font-family: var(--mono); color: var(--home); }
+    .sk-points-display { font-size: 11px; color: var(--gold); margin-bottom: 10px; font-family: var(--mono); }
+
+    /* ── MISSIONS ── */
+    #missions-panel {
+      position: absolute; top: 44px; right: 0; width: 230px;
+      background: var(--panel); border-left: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); padding: 10px;
+      font-family: var(--ui); z-index: 10; max-height: calc(100vh - 44px); overflow-y: auto;
+    }
+    #missions-panel h3 { font-size: 11px; font-weight: 700; color: var(--home); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+    .mission-card {
+      background: var(--panel2); border: 1px solid var(--border);
+      border-radius: 5px; padding: 8px; margin-bottom: 6px; font-size: 10px;
+      transition: border-color .15s;
+    }
+    .mission-card.mc-active { border-color: #ffd70044; }
+    .mission-card.mc-complete { border-color: var(--home); background: #00ff9610; }
+    .mission-title { font-size: 10px; font-weight: 700; color: var(--text); margin-bottom: 3px; font-family: var(--mono); }
+    .mission-desc { font-size: 9px; color: var(--muted); line-height: 1.5; margin-bottom: 4px; }
+    .mission-prog { width: 100%; height: 4px; background: #0a1020; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+    .mission-prog-fill { height: 100%; background: var(--net); transition: width .3s; }
+    .mission-reward { font-size: 9px; color: var(--gold); font-family: var(--mono); }
+    .mission-claim-btn {
+      display: block; width: 100%; margin-top: 5px; padding: 4px;
+      background: transparent; border: 1px solid var(--home); color: var(--home);
+      font-family: var(--mono); font-size: 9px; border-radius: 3px; cursor: pointer;
+      transition: all .15s; letter-spacing: .05em;
+    }
+    .mission-claim-btn:hover { background: #00ff9618; }
+    .mission-refresh-btn {
+      display: block; width: 100%; padding: 5px; margin-top: 4px;
+      background: transparent; border: 1px solid var(--border2); color: var(--muted);
+      font-family: var(--mono); font-size: 9px; border-radius: 3px; cursor: pointer;
+      transition: all .15s;
+    }
+    .mission-refresh-btn:hover { border-color: var(--border2); color: var(--text); }
+
+    /* ── BLACK MARKET ── */
+    #blackmarket-overlay {
+      position: absolute; inset: 0; background: #000d; z-index: 35;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    #blackmarket-box {
+      background: var(--panel); border: 1px solid #ff444455;
+      border-radius: 8px; width: min(780px,100%); max-height: calc(100vh - 40px);
+      overflow-y: auto; padding: 18px; font-family: var(--ui);
+    }
+    #blackmarket-box h2 { font-size: 15px; font-weight: 600; color: var(--danger); margin-bottom: 4px; }
+    .bm-rotate-info { font-size: 10px; color: var(--muted); margin-bottom: 12px; font-family: var(--mono); }
+    .bm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; margin-bottom: 14px; }
+    .bm-card {
+      background: var(--panel2); border: 1px solid #ff444433; border-radius: 5px;
+      padding: 10px; cursor: pointer; transition: all .15s; position: relative;
+    }
+    .bm-card:hover:not(.bm-sold) { border-color: #ff444488; background: var(--panel3); }
+    .bm-card.bm-selected { border-color: var(--danger); background: #ff44441a; }
+    .bm-card.bm-sold { opacity: .35; cursor: not-allowed; }
+    .bm-card-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .bm-card-type { font-size: 9px; color: var(--danger); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .bm-card-desc { font-size: 9px; color: var(--muted); line-height: 1.5; margin-bottom: 4px; }
+    .bm-card-cost { font-size: 12px; color: var(--danger); font-family: var(--mono); font-weight: 600; }
+    .bm-sold-tag { font-size: 9px; color: var(--danger); font-family: var(--mono); }
+    .bm-rare-tag {
+      position: absolute; top: 6px; right: 6px; font-size: 8px;
+      background: #ff44441a; color: var(--danger); border: 1px solid #ff444455;
+      padding: 1px 4px; border-radius: 2px; font-family: var(--mono);
+    }
+    .bm-timer { font-size: 9px; color: var(--danger); font-family: var(--mono); margin-top: 4px; }
+
+    /* ── NODE OWNERSHIP / PASSIVE INCOME ── */
+    .owned-income-badge {
+      position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+      font-size: 8px; background: #00ff9618; color: var(--home);
+      border: 1px solid #00ff9644; padding: 1px 5px; border-radius: 2px;
+      font-family: var(--mono); white-space: nowrap; pointer-events: none;
+    }
+    #income-ticker {
+      position: absolute; top: 44px; left: 50%; transform: translateX(-50%);
+      pointer-events: none; z-index: 15;
+    }
+    .income-pop {
+      font-size: 11px; font-family: var(--mono); color: var(--home);
+      animation: incomeFloat 1.8s ease-out forwards;
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+    }
+    @keyframes incomeFloat {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-40px); }
+    }
+
     /* Save toast */
     #save-toast {
       position: absolute;
@@ -831,6 +1042,56 @@
       z-index: 50;
       font-family: var(--mono)
     }
+
+    /* ── MULTIPLAYER ── */
+    #mp-overlay {
+      position: absolute; inset: 0; background: #000d; z-index: 45;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    #mp-box {
+      background: var(--panel); border: 1px solid #0096ff66;
+      border-radius: 8px; width: min(680px,100%); max-height: calc(100vh - 40px);
+      overflow-y: auto; padding: 18px; font-family: var(--mono);
+    }
+    #mp-box h2 { font-size: 15px; font-weight: 700; color: var(--net); margin-bottom: 4px; letter-spacing: .15em; }
+    #mp-box .mp-hint { font-size: 10px; color: var(--muted); margin-bottom: 14px; line-height: 1.7; }
+    .mp-step { background: var(--panel2); border: 1px solid var(--border); border-radius: 5px; padding: 12px; margin-bottom: 10px; }
+    .mp-step-title { font-size: 11px; color: var(--net); margin-bottom: 8px; letter-spacing: .08em; }
+    .mp-btn {
+      padding: 6px 16px; background: transparent; border: 1px solid var(--net);
+      color: var(--net); font-family: var(--mono); font-size: 11px;
+      border-radius: 3px; cursor: pointer; transition: all .15s; margin-right: 6px; margin-top: 6px;
+    }
+    .mp-btn:hover:not(:disabled) { background: #0096ff18; }
+    .mp-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .mp-btn.red { border-color: var(--danger); color: var(--danger); }
+    .mp-btn.red:hover:not(:disabled) { background: #ff44441a; }
+    .mp-textarea {
+      width: 100%; height: 78px; background: #060c14; border: 1px solid var(--border2);
+      color: var(--home); font-family: var(--mono); font-size: 9px;
+      border-radius: 3px; padding: 6px; resize: vertical; margin-top: 6px; display: block;
+    }
+    .mp-label { font-size: 9px; color: var(--muted); margin-top: 8px; display: block; }
+    .mp-status { font-size: 10px; margin-top: 8px; min-height: 14px; }
+    .mp-status.ok { color: var(--home); }
+    .mp-status.err { color: var(--danger); }
+    .mp-status.warn { color: var(--warn); }
+    #mp-peers-list { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+    .mp-peer-row {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px; font-size: 10px;
+    }
+    .mp-peer-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mp-peer-name { flex: 1; }
+    .mp-peer-ping { color: var(--muted); font-size: 9px; }
+    .mp-avatar {
+      position: absolute; pointer-events: none; z-index: 18;
+      font-size: 9px; font-family: var(--mono); transform: translate(-50%,-120%);
+      white-space: nowrap; transition: left .4s, top .4s;
+    }
+    .mp-avatar-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 2px; border: 1px solid #fff3; }
+    #mp-badge { font-size: 9px; color: var(--net); font-family: var(--mono); padding: 1px 6px;
+      border: 1px solid var(--net); border-radius: 2px; display: none; margin-left: 4px; }
   </style>
 </head>
 
@@ -844,8 +1105,11 @@
       <div style="flex:1"></div>
       <button class="hbtn" onclick="openBuilder()">[ CONFIGURE RIG ]</button>
       <button class="hbtn" onclick="openShop()">[ SHOP ]</button>
+      <button class="hbtn" onclick="openBlackMarket()">[ BLACK MARKET ]</button>
+      <button class="hbtn" onclick="openSkillTree()">[ SKILLS ]</button>
       <button class="hbtn" onclick="saveGame()">[ SAVE ]</button>
       <button class="hbtn" onclick="loadGame()">[ LOAD ]</button>
+      <button class="hbtn" onclick="openMultiplayer()" id="mp-hud-btn">[ MULTIPLAYER ]<span id="mp-badge"></span></button>
       <button class="hbtn" onclick="resetGame()">[ RESET ]</button>
     </div>
     <div id="canvas-wrap">
@@ -869,6 +1133,7 @@
         <div style="font-size:9px;color:var(--danger);margin-bottom:8px;display:none" id="pop-lockout">LOCKED OUT</div>
         <button class="pbtn" id="btn-scan" onclick="doScan()">[ SCAN ]</button>
         <button class="pbtn" id="btn-hack" onclick="doHack()">[ HACK ]</button>
+        <button class="pbtn danger" id="btn-breach" onclick="doBreach()" style="display:none">[ BREACH — USE TOOL ]</button>
         <button class="pbtn" id="btn-login" onclick="doLogin()">[ LOGIN ]</button>
         <button class="pbtn" id="btn-loot" onclick="doLoot()">[ LOOT ]</button>
         <button class="pbtn danger" id="btn-remove" onclick="doRemove()">[ REMOVE NODE ]</button>
@@ -876,6 +1141,51 @@
       </div>
       <div id="log"></div>
       <div id="minimap"><canvas id="mm-canvas" width="130" height="85"></canvas></div>
+      <!-- Hacking tools hotbar -->
+      <div id="tools-bar"></div>
+      <!-- Missions panel -->
+      <div id="missions-panel">
+        <h3>// MISSIONS</h3>
+        <div id="missions-list"></div>
+        <button class="mission-refresh-btn" onclick="refreshMissions()">[ REFRESH MISSIONS ]</button>
+      </div>
+      <!-- Income ticker -->
+      <div id="income-ticker"></div>
+    </div>
+  </div>
+
+  <!-- MINIGAME OVERLAY -->
+  <div id="minigame-overlay" style="display:none;position:absolute;inset:0;background:#000d;z-index:50;align-items:center;justify-content:center">
+    <div id="minigame-box">
+      <h2 id="mg-title">// BOSS NODE — BREACH REQUIRED</h2>
+      <div id="mg-desc"></div>
+      <div id="mg-tool-select">
+        <p>Select hacking tool to use:</p>
+        <div id="mg-tool-btns"></div>
+      </div>
+      <div id="mg-timer-wrap" style="display:none"><div id="mg-timer-fill" style="width:100%"></div></div>
+      <!-- Sequence breaker -->
+      <div id="mg-sequence-area">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:4px">REPEAT THE SEQUENCE — watch then input</div>
+        <div class="seq-display" id="seq-display"></div>
+        <div class="seq-input-row" id="seq-input-row"></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px" id="seq-status"></div>
+      </div>
+      <!-- Firewall pathfinder -->
+      <div id="mg-firewall-area">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:6px">ROUTE PACKETS — click cells to build a path from S to E avoiding blockers</div>
+        <div id="fw-grid"></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px" id="fw-status"></div>
+      </div>
+      <!-- Decrypt pairs -->
+      <div id="mg-decrypt-area">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:6px">MATCH THE PAIRS — find matching hex pairs before time runs out</div>
+        <div class="decrypt-pairs" id="decrypt-grid"></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px" id="decrypt-status"></div>
+      </div>
+      <button id="mg-start-btn" onclick="startMinigame()">[ START BREACH ]</button>
+      <div id="mg-result"></div>
+      <button id="mg-close-btn" onclick="closeMinigame()" style="display:none">[ CLOSE ]</button>
     </div>
   </div>
 
@@ -888,8 +1198,9 @@
         <button class="stab active" onclick="shopTabClick('mb',this)">Motherboard</button>
         <button class="stab" onclick="shopTabClick('cpu',this)">CPU</button>
         <button class="stab" onclick="shopTabClick('ram',this)">RAM</button>
-        <button class="stab" onclick="shopTabClick('net',this)">NET</button>
+        <button class="stab" onclick="shopTabClick('net',this)">NIC</button>
         <button class="stab" onclick="shopTabClick('gpu',this)">GPU</button>
+        <button class="stab" onclick="shopTabClick('tools',this)">Hacking Tools</button>
       </div>
       <div class="parts-grid" id="parts-grid"></div>
       <div class="modal-footer">
@@ -922,7 +1233,95 @@
     </div>
   </div>
 
+  <!-- MULTIPLAYER -->
+  <div id="mp-overlay">
+    <div id="mp-box">
+      <h2>// LAN MULTIPLAYER</h2>
+      <div class="mp-hint">
+        Peer-to-peer over WebRTC — no server needed, works on the same Wi-Fi/LAN.<br>
+        <b>Host</b> creates an Offer → sends code to peer → peer pastes it, creates Answer → host pastes Answer → connected!<br>
+        Once connected, you'll see each other's location on the map in real time.
+      </div>
+
+      <!-- Step 1: Identity -->
+      <div class="mp-step">
+        <div class="mp-step-title">[ 1 ] YOUR HANDLE</div>
+        <input id="mp-name-input" type="text" maxlength="12" placeholder="Hacker handle…"
+          style="background:#060c14;border:1px solid var(--border2);color:var(--home);font-family:var(--mono);font-size:11px;padding:5px 8px;border-radius:3px;width:180px">
+      </div>
+
+      <!-- Step 2: Host -->
+      <div class="mp-step">
+        <div class="mp-step-title">[ 2 ] HOST — Create Offer</div>
+        <button class="mp-btn" onclick="mpCreateOffer()">Create Offer</button>
+        <span class="mp-label">Your offer code (copy and send to peer):</span>
+        <textarea class="mp-textarea" id="mp-offer-out" readonly placeholder="Offer will appear here…"></textarea>
+        <button class="mp-btn" onclick="mpCopyText('mp-offer-out')" style="margin-top:4px">Copy Offer</button>
+        <div class="mp-status" id="mp-host-status"></div>
+      </div>
+
+      <!-- Step 3: Join -->
+      <div class="mp-step">
+        <div class="mp-step-title">[ 3 ] JOIN — Paste Offer &amp; Create Answer</div>
+        <span class="mp-label">Paste host's offer code here:</span>
+        <textarea class="mp-textarea" id="mp-offer-in" placeholder="Paste offer from host…"></textarea>
+        <button class="mp-btn" onclick="mpCreateAnswer()" style="margin-top:6px">Create Answer</button>
+        <span class="mp-label">Your answer code (copy and send back to host):</span>
+        <textarea class="mp-textarea" id="mp-answer-out" readonly placeholder="Answer will appear here…"></textarea>
+        <button class="mp-btn" onclick="mpCopyText('mp-answer-out')">Copy Answer</button>
+        <div class="mp-status" id="mp-join-status"></div>
+      </div>
+
+      <!-- Step 4: Host completes -->
+      <div class="mp-step">
+        <div class="mp-step-title">[ 4 ] HOST — Paste Answer to Connect</div>
+        <span class="mp-label">Paste peer's answer code here:</span>
+        <textarea class="mp-textarea" id="mp-answer-in" placeholder="Paste answer from peer…"></textarea>
+        <button class="mp-btn" onclick="mpAcceptAnswer()">Connect</button>
+        <div class="mp-status" id="mp-connect-status"></div>
+      </div>
+
+      <!-- Connected peers -->
+      <div class="mp-step">
+        <div class="mp-step-title">[ CONNECTED PEERS ]</div>
+        <div id="mp-peers-list"><div style="font-size:9px;color:var(--muted)">No peers connected yet.</div></div>
+        <button class="mp-btn red" onclick="mpDisconnectAll()" style="margin-top:8px">Disconnect All</button>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+        <button class="mp-btn" onclick="closeMultiplayer()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div id="save-toast">Game saved.</div>
+
+  <!-- SKILL TREE -->
+  <div id="skilltree-overlay">
+    <div id="skilltree-box">
+      <h2>// SKILL TREE</h2>
+      <div class="sk-points-display" id="sk-points-display">Skill Points: 0</div>
+      <div class="sk-xp-bar-wrap"><div class="sk-xp-bar-fill" id="sk-xp-bar" style="width:0%"></div></div>
+      <div class="sk-branches" id="sk-branches"></div>
+      <div class="modal-footer" style="margin-top:14px">
+        <button class="sfbtn cancel" onclick="closeSkillTree()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLACK MARKET -->
+  <div id="blackmarket-overlay">
+    <div id="blackmarket-box">
+      <h2>// BLACK MARKET</h2>
+      <div class="bm-rotate-info" id="bm-rotate-info">Inventory rotates every 3 minutes</div>
+      <div class="bm-grid" id="bm-grid"></div>
+      <div class="modal-footer">
+        <span id="bm-status" style="font-size:11px;color:var(--warn);margin-right:auto"></span>
+        <button class="sfbtn cancel" onclick="closeBlackMarket()">Close</button>
+        <button class="sfbtn confirm" id="bm-buy-btn" onclick="bmBuySelected()" disabled style="border-color:var(--danger);color:var(--danger)">Purchase</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     /* ═══════════════════════════════════════════════════
@@ -938,110 +1337,127 @@
     mb: [
       { id: 'mb1', name: 'CoreBit A1', star: 1, type: 'mb', cost: 0, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Starter board' },
       { id: 'mb2', name: 'NovaTek Z3', star: 1, type: 'mb', cost: 120, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Basic board' },
-      { id: 'mb3', name: 'NovaTek Z5', star: 1, type: 'mb', cost: 220, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Enhanced DDR3' },
+      { id: 'mb3', name: 'NovaTek Z5', star: 2, type: 'mb', cost: 220, socket: 'AM3', memType: 'DDR3', slots: 2, spec: 'AM3 · DDR3 · 2 slots', desc: 'Enhanced DDR3' },
 
-      { id: 'mb4', name: 'QuantumX Z5', star: 1, type: 'mb', cost: 300, socket: 'AM4', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Mid-range board' },
-      { id: 'mb5', name: 'QuantumX Z7', star: 2, type: 'mb', cost: 450, socket: 'AM4', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Refined mid-range' },
-      { id: 'mb6', name: 'VoidCore B450', star: 2, type: 'mb', cost: 700, socket: 'LGA2', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Performance DDR4' },
+      { id: 'mb4', name: 'QuantumX Z5', star: 2, type: 'mb', cost: 300, socket: 'AM4', memType: 'DDR4', slots: 2, spec: 'AM4 · DDR4 · 2 slots', desc: 'Mid-range board' },
+      { id: 'mb5', name: 'QuantumX Z7', star: 2, type: 'mb', cost: 450, socket: 'AM4', memType: 'DDR4', slots: 2, spec: 'AM4 · DDR4 · 2 slots', desc: 'Refined mid-range' },
+      { id: 'mb6', name: 'VoidCore B450', star: 3, type: 'mb', cost: 700, socket: 'LGA2', memType: 'DDR4', slots: 4, spec: 'AM4 · DDR4 · 4 slots', desc: 'Performance DDR4' },
 
-      { id: 'mb7', name: 'QuantumX Z9', star: 2, type: 'mb', cost: 900, socket: 'AM5', memType: 'DDR5', slots: 4, spec: 'AM5 · DDR5 · 4 slots', desc: 'High-end board' },
-      { id: 'mb8', name: 'VoidCore X99', star: 2, type: 'mb', cost: 1400, socket: 'LGA2', memType: 'DDR5', slots: 4, spec: 'LGA2 · DDR5 · 4 slots', desc: 'Workstation DDR5' },
-      { id: 'mb9', name: 'VoidCore X199', star: 3, type: 'mb', cost: 2000, socket: 'LGA2', memType: 'DDR5', slots: 8, spec: 'LGA2 · DDR5 · 8 slots', desc: 'Extreme DDR5' },
+      { id: 'mb7', name: 'QuantumX Z9', star: 3, type: 'mb', cost: 900, socket: 'AM5', memType: 'DDR5', slots: 2, spec: 'AM5 · DDR5 · 2 slots', desc: 'High-end board' },
+      { id: 'mb8', name: 'VoidCore X99', star: 4, type: 'mb', cost: 1400, socket: 'AM5', memType: 'DDR5', slots: 2, spec: 'AM5 · DDR5 · 2 slots', desc: 'Workstation DDR5' },
+      { id: 'mb9', name: 'VoidCore X199', star: 4, type: 'mb', cost: 2000, socket: 'LGA2', memType: 'DDR5', slots: 4, spec: 'LGA2 · DDR5 · 4 slots', desc: 'Extreme DDR5' },
 
-      { id: 'mb10', name: 'VoidCore X299', star: 3, type: 'mb', cost: 2600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'Next-gen entry' },
-      { id: 'mb11', name: 'VoidCore X399', star: 3, type: 'mb', cost: 3600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'High bandwidth DDR6' },
-      { id: 'mb12', name: 'OmegaForge X1', star: 3, type: 'mb', cost: 5000, socket: 'AM6', memType: 'DDR6', slots: 8, spec: 'AM6 · DDR6 · 8 slots', desc: 'Extreme DDR6' },
+      { id: 'mb10', name: 'VoidCore X299', star: 4, type: 'mb', cost: 2600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'Next-gen entry' },
+      { id: 'mb11', name: 'VoidCore X399', star: 5, type: 'mb', cost: 3600, socket: 'LGA2', memType: 'DDR6', slots: 4, spec: 'LGA2 · DDR6 · 4 slots', desc: 'High bandwidth DDR6' },
+      { id: 'mb12', name: 'OmegaForge X1', star: 5, type: 'mb', cost: 5000, socket: 'AM6', memType: 'DDR6', slots: 8, spec: 'AM6 · DDR6 · 8 slots', desc: 'Extreme DDR6' },
 
-      { id: 'mb13', name: 'OmegaForge X2', star: 4, type: 'mb', cost: 6500, socket: 'AM6', memType: 'DDR7', slots: 4, spec: 'AM6 · DDR7 · 4 slots', desc: 'Next-gen flagship' },
-      { id: 'mb14', name: 'OmegaForge X3', star: 4, type: 'mb', cost: 9000, socket: 'AM7', memType: 'DDR7', slots: 4, spec: 'AM7 · DDR7 · 4 slots', desc: 'Elite DDR7' },
-      { id: 'mb15', name: 'OmegaForge X4', star: 4, type: 'mb', cost: 12000, socket: 'AM7', memType: 'DDR7', slots: 8, spec: 'AM7 · DDR7 · 8 slots', desc: 'Ultimate DDR7' },
+      { id: 'mb13', name: 'OmegaForge X2', star: 5, type: 'mb', cost: 6500, socket: 'AM6', memType: 'DDR7', slots: 4, spec: 'AM6 · DDR7 · 4 slots', desc: 'Next-gen flagship' },
+      { id: 'mb14', name: 'OmegaForge X3', star: 6, type: 'mb', cost: 9000, socket: 'AM7', memType: 'DDR7', slots: 4, spec: 'AM7 · DDR7 · 4 slots', desc: 'Elite DDR7' },
+      { id: 'mb15', name: 'OmegaForge X4', star: 6, type: 'mb', cost: 12000, socket: 'AM7', memType: 'DDR7', slots: 8, spec: 'AM7 · DDR7 · 8 slots', desc: 'Ultimate DDR7' },
 
-      { id: 'mb16', name: 'VovaTech Apex', star: 4, type: 'mb', cost: 15000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Cutting-edge platform' },
-      { id: 'mb17', name: 'VovaTech Apex Pro', star: 5, type: 'mb', cost: 22000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Extreme DDR8' },
-      { id: 'mb18', name: 'VovaTech Apex Ultra', star: 5, type: 'mb', cost: 30000, socket: 'DL5', memType: 'DDR8', slots: 16, spec: 'DL5 · DDR8 · 16 slots', desc: 'Absolute maximum platform' },
-      
-      { id: 'mb19', name: 'VovaTech Apex Omega', star: 6, type: 'mb', cost: 45000, socket: 'DL6', memType: 'DDR8', slots: 16, spec: 'DL6 · DDR8 · 16 slots', desc: 'True maximum platform & Quantum Computations' }
+      { id: 'mb16', name: 'VovaTech Apex', star: 6, type: 'mb', cost: 15000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Cutting-edge platform' },
+      { id: 'mb17', name: 'VovaTech Apex Pro', star: 7, type: 'mb', cost: 22000, socket: 'DL5', memType: 'DDR8', slots: 12, spec: 'DL5 · DDR8 · 12 slots', desc: 'Extreme DDR8' },
+      { id: 'mb18', name: 'VovaTech Apex Ultra', star: 7, type: 'mb', cost: 30000, socket: 'DL5', memType: 'DDR8', slots: 16, spec: 'DL5 · DDR8 · 16 slots', desc: 'Absolute maximum platform' }
     ],
-    cpu: [
-      { id: 'cpu1', name: 'CoreRush 4', star: 1, type: 'cpu', cost: 0, socket: 'AM3', hackBonus: 0, spec: 'AM3 · +0% hack', desc: 'Entry 4-core' },
-      { id: 'cpu2', name: 'CoreRush 8', star: 1, type: 'cpu', cost: 250, socket: 'AM3', hackBonus: 8, spec: 'AM3 · +8% hack', desc: 'Budget 8-core' },
-      
-      { id: 'cpu3', name: 'CoreRush 8', star: 1, type: 'cpu', cost: 400, socket: 'AM4', hackBonus: 12, spec: 'AM4 · +12% hack', desc: '8-core mid' },
-      { id: 'cpu4', name: 'CoreRush 12', star: 2, type: 'cpu', cost: 550, socket: 'AM4', hackBonus: 14, spec: 'AM4 · +14% hack', desc: '12-core mid' },
+      cpu: [
+        { id: 'cpu1', name: 'CoreRush 4', star: 1, type: 'cpu', cost: 0, socket: 'AM3', hackBonus: 0, spec: 'AM3 · +0% hack', desc: 'Entry 4-core' },
+        { id: 'cpu2', name: 'CoreRush 8', star: 2, type: 'cpu', cost: 250, socket: 'AM3', hackBonus: 8, spec: 'AM3 · +8% hack', desc: 'Budget 8-core' },
+        
+        { id: 'cpu3', name: 'CoreRush 12', star: 2, type: 'cpu', cost: 400, socket: 'AM4', hackBonus: 12, spec: 'AM4 · +12% hack', desc: '8-core mid' },
+        { id: 'cpu4', name: 'CoreRush 12', star: 2, type: 'cpu', cost: 550, socket: 'AM4', hackBonus: 14, spec: 'AM4 · +14% hack', desc: '12-core mid' },
 
-      { id: 'cpu5', name: 'NexGen 12X', star: 2, type: 'cpu', cost: 700, socket: 'AM5', hackBonus: 20, spec: 'AM5 · +20% hack', desc: '12-core performer' },
-      { id: 'cpu6', name: 'NexGen 16X', star: 2, type: 'cpu', cost: 1300, socket: 'AM5', hackBonus: 26, spec: 'AM5 · +26% hack', desc: '16-core powerhouse' },
+        { id: 'cpu5', name: 'NexGen 16X', star: 3, type: 'cpu', cost: 700, socket: 'AM5', hackBonus: 20, spec: 'AM5 · +20% hack', desc: '12-core performer' },
+        { id: 'cpu6', name: 'NexGen 24X', star: 4, type: 'cpu', cost: 1300, socket: 'AM5', hackBonus: 26, spec: 'AM5 · +26% hack', desc: '16-core powerhouse' },
 
-      { id: 'cpu7', name: 'VoidCore Titan', star: 3, type: 'cpu', cost: 2000, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '16-core extreme' },
-      { id: 'cpu8', name: 'VoidCore Titan X2', star: 3, type: 'cpu', cost: 2500, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '32-core extreme' },
+        { id: 'cpu7', name: 'VoidCore Titan', star: 4, type: 'cpu', cost: 2000, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '16-core extreme' },
+        { id: 'cpu8', name: 'VoidCore Titan', star: 4, type: 'cpu', cost: 2000, socket: 'LGA2', hackBonus: 48, spec: 'LGA2 · +48% hack', desc: '32-core extreme' },
 
-      { id: 'cpu9', name: 'QuantaCore ZX-AM6-1', star: 3, type: 'cpu', cost: 3250, socket: 'AM6', hackBonus: 60, spec: 'AM6 · +60% hack', desc: '32-core next-gen' },
-      { id: 'cpu10', name: 'QuantaCore ZX-AM6-2', star: 4, type: 'cpu', cost: 4000, socket: 'AM6', hackBonus: 70, spec: 'AM6 · +70% hack', desc: '64-core net-gen' },
+        { id: 'cpu9', name: 'QuantaCore ZX-4', star: 5, type: 'cpu', cost: 4000, socket: 'DL5', hackBonus: 60, spec: 'DL5 · +60% hack', desc: '64-core next-gen' },
+        { id: 'cpu10', name: 'QuantaCore ZX-9', star: 5, type: 'cpu', cost: 10000, socket: 'DL5', hackBonus: 70, spec: 'DL5 · +70% hack', desc: '128-core hyper-gen' },
+      ],
+      ram: [
+        { id: 'ram1', name: 'CoreBit 2GB DDR3', star: 1, type: 'ram', cost: 0, memType: 'DDR3', sticks: 2, nodeBonus: 0, spec: 'DDR3 · 2 stick · +0 nodes', desc: 'Old as ur mum, lol gottem' },
+        { id: 'ram2', name: 'CoreBit 4GB DDR3', star: 1, type: 'ram', cost: 6, memType: 'DDR3', sticks: 2, nodeBonus: 2, spec: 'DDR3 · 2 sticks · +2 nodes', desc: 'Old dual channel' },
 
-      { id: 'cpu11', name: 'QuantaCore ZX-AM7-1', star: 4, type: 'cpu', cost: 5000, socket: 'AM7', hackBonus: 80, spec: 'AM7 · +80% hack', desc: '64-core hyper-gen' },
-      { id: 'cpu12', name: 'QuantaCore ZX-AM7-2', star: 4, type: 'cpu', cost: 6000, socket: 'AM7', hackBonus: 90, spec: 'AM7 · +90% hack', desc: '128-core hyper-gen' },
+        { id: 'ram3', name: 'CoreBit 2GB DDR4', star: 1, type: 'ram', cost: 25, memType: 'DDR4', sticks: 2, nodeBonus: 0, spec: 'DDR4 · 2 stick · +0 nodes', desc: 'Baseline DDR4' },
+        { id: 'ram4', name: 'CoreBit 4GB DDR4', star: 2, type: 'ram', cost: 45, memType: 'DDR4', sticks: 2, nodeBonus: 4, spec: 'DDR4 · 2 sticks · +4 nodes', desc: 'Reliable dual channel' },
+        { id: 'ram5', name: 'SwiftMem 8GB DDR4', star: 2, type: 'ram', cost: 70, memType: 'DDR4', sticks: 4, nodeBonus: 8, spec: 'DDR4 · 4 sticks · +8 nodes', desc: 'Performance quad channel' },
 
-      { id: 'cpu13', name: 'QuantaCore ZY-V1', star: 5, type: 'cpu', cost: 7500, socket: 'DL5', hackBonus: 100, spec: 'DL5 · +100% hack', desc: '128-core next-gen' },
-      { id: 'cpu14', name: 'QuantaCore ZY-V2', star: 5, type: 'cpu', cost: 10000, socket: 'DL5', hackBonus: 125, spec: 'DL5 · +125% hack', desc: '256-core hyper-gen' },
+        { id: 'ram6', name: 'CoreBit 4GB DDR5', star: 2, type: 'ram', cost: 50, memType: 'DDR5', sticks: 2, nodeBonus: 6, spec: 'DDR5 · 2 sticks · +6 nodes', desc: 'Fast DDR5 dual' },
+        { id: 'ram7', name: 'SwiftMem 8GB DDR5', star: 2, type: 'ram', cost: 125, memType: 'DDR5', sticks: 2, nodeBonus: 12, spec: 'DDR5 · 2 sticks · +12 nodes', desc: 'High bandwidth quad' },
+        { id: 'ram8', name: 'SwiftMem 16GB DDR5', star: 3, type: 'ram', cost: 175, memType: 'DDR5', sticks: 4, nodeBonus: 24, spec: 'DDR5 · 4 sticks · +24 nodes', desc: 'Heavy workload DDR5' },
+        { id: 'ram9', name: 'SwiftMem 32GB DDR5', star: 3, type: 'ram', cost: 350, memType: 'DDR5', sticks: 4, nodeBonus: 48, spec: 'DDR5 · 4 sticks · +48 nodes', desc: 'Super heavy workload DDR5' },
 
-      { id: 'cpu15', name: 'QuantaCore YZY-Quantum', star: 6, type: 'cpu', cost: 50000, socket: 'DL6', hackBonus: 250, spec: 'DL6 · +250% hack', desc: '512-core quantum-gen' },
-    ],
-    ram: [
-      { id: 'ram1', name: 'CoreBit 4GB DDR3', star: 1, type: 'ram', cost: 0, memType: 'DDR3', sticks: 2, nodeBonus: 0, spec: 'DDR3 · 1 stick · +0 nodes', desc: 'Legacy baseline' },
-      { id: 'ram2', name: 'SwiftMem 8GB DDR3', star: 1, type: 'ram', cost: 80, memType: 'DDR3', sticks: 2, nodeBonus: 2, spec: 'DDR3 · 2 sticks · +2 nodes', desc: 'Old dual channel' },
+        { id: 'ram10', name: 'SwiftMem 8GB DDR6', star: 3, type: 'ram', cost: 275, memType: 'DDR6', sticks: 2, nodeBonus: 16, spec: 'DDR6 · 4 sticks · +16 nodes', desc: 'Baseline DDR6' },
+        { id: 'ram11', name: 'CoreBit 16GB DDR6', star: 3, type: 'ram', cost: 400, memType: 'DDR6', sticks: 2, nodeBonus: 20, spec: 'DDR6 · 2 sticks · +20 nodes', desc: 'Next-gen dual' },
+        { id: 'ram12', name: 'CoreBit 32GB DDR6', star: 3, type: 'ram', cost: 550, memType: 'DDR6', sticks: 4, nodeBonus: 24, spec: 'DDR6 · 4 sticks · +24 nodes', desc: 'Extreme quad' },
+        { id: 'ram13', name: 'OmegaRAM 64GB DDR6', star: 4, type: 'ram', cost: 725, memType: 'DDR6', sticks: 4, nodeBonus: 30, spec: 'DDR6 · 4 sticks · +30 nodes', desc: 'Massive capacity' },
 
-      { id: 'ram3', name: 'CoreBit 8GB DDR4', star: 1, type: 'ram', cost: 120, memType: 'DDR4', sticks: 2, nodeBonus: 3, spec: 'DDR4 · 1 stick · +3 nodes', desc: 'Baseline DDR4' },
-      { id: 'ram4', name: 'CoreBit 16GB DDR4', star: 2, type: 'ram', cost: 220, memType: 'DDR4', sticks: 2, nodeBonus: 7, spec: 'DDR4 · 2 sticks · +7 nodes', desc: 'Reliable dual channel' },
-      { id: 'ram5', name: 'SwiftMem 32GB DDR4', star: 3, type: 'ram', cost: 400, memType: 'DDR4', sticks: 4, nodeBonus: 15, spec: 'DDR4 · 4 sticks · +15 nodes', desc: 'Performance quad channel' },
+        { id: 'ram14', name: 'CoreBit 16GB DDR7', star: 4, type: 'ram', cost: 1000, memType: 'DDR7', sticks: 2, nodeBonus: 32, spec: 'DDR7 · 2 sticks · +32 nodes', desc: 'Elite performance' },
+        { id: 'ram15', name: 'OmegaRAM 32GB DDR7', star: 4, type: 'ram', cost: 1300, memType: 'DDR7', sticks: 2, nodeBonus: 36, spec: 'DDR7 · 2 sticks · +36 nodes', desc: 'Ultra capacity' },
+        { id: 'ram16', name: 'OmegaRAM 64GB DDR7', star: 4, type: 'ram', cost: 1525, memType: 'DDR7', sticks: 4, nodeBonus: 40, spec: 'DDR7 · 4 sticks · +40 nodes', desc: 'Elite performance' },
+        { id: 'ram17', name: 'NovaTech 128GB DDR7', star: 4, type: 'ram', cost: 1750, memType: 'DDR7', sticks: 4, nodeBonus: 45, spec: 'DDR7 · 4 sticks · +45 nodes', desc: 'Ultra capacity' },
 
-      { id: 'ram6', name: 'CoreBit 32GB DDR5', star: 3, type: 'ram', cost: 550, memType: 'DDR5', sticks: 2, nodeBonus: 18, spec: 'DDR5 · 2 sticks · +18 nodes', desc: 'Fast DDR5 dual' },
-      { id: 'ram7', name: 'SwiftMem 64GB DDR5', star: 4, type: 'ram', cost: 950, memType: 'DDR5', sticks: 4, nodeBonus: 30, spec: 'DDR5 · 4 sticks · +30 nodes', desc: 'High bandwidth quad' },
-      { id: 'ram8', name: 'SwiftMem 128GB DDR5', star: 4, type: 'ram', cost: 1800, memType: 'DDR5', sticks: 8, nodeBonus: 48, spec: 'DDR5 · 8 sticks · +48 nodes', desc: 'Heavy workload DDR5' },
+        { id: 'ram18', name: 'OmegaRAM 512GB DDR8', star: 4, type: 'ram', cost: 2250, memType: 'DDR8', sticks: 8, nodeBonus: 50, spec: 'DDR8 · 8 sticks · +50 nodes', desc: 'Cutting-edge' },
+        { id: 'ram19', name: 'OmegaRAM 1TB DDR8', star: 5, type: 'ram', cost: 2750, memType: 'DDR8', sticks: 8, nodeBonus: 75, spec: 'DDR8 · 8 sticks · +75 nodes', desc: 'Server-grade monster' },
+        { id: 'ram20', name: 'NovaTech 2TB DDR8', star: 5, type: 'ram', cost: 3750, memType: 'DDR8', sticks: 12, nodeBonus: 100, spec: 'DDR8 · 12 sticks · +100 nodes', desc: 'Absolute maximum' },
+        { id: 'ram21', name: 'NovaTech 8TB DDR8', star: 6, type: 'ram', cost: 5000, memType: 'DDR8', sticks: 12, nodeBonus: 125, spec: 'DDR8 · 12 sticks · +125 nodes', desc: 'True Power' },
 
-      { id: 'ram9', name: 'CoreBit 64GB DDR6', star: 4, type: 'ram', cost: 2200, memType: 'DDR6', sticks: 2, nodeBonus: 40, spec: 'DDR6 · 2 sticks · +40 nodes', desc: 'Next-gen dual' },
-      { id: 'ram10', name: 'SwiftMem 128GB DDR6', star: 4, type: 'ram', cost: 4200, memType: 'DDR6', sticks: 4, nodeBonus: 75, spec: 'DDR6 · 4 sticks · +75 nodes', desc: 'Extreme quad' },
-      { id: 'ram11', name: 'OmegaRAM 256GB DDR6', star: 4, type: 'ram', cost: 7800, memType: 'DDR6', sticks: 8, nodeBonus: 130, spec: 'DDR6 · 8 sticks · +130 nodes', desc: 'Massive capacity' },
+        /* This Exists Purly As A Joke */
+        { id: 'ram22', name: 'OmegaRAM 256TB DDR12X', star: 8, type: 'ram', cost: 1000000, memType: 'DDR12X', sticks: 64, nodeBonus: 25000, spec: 'DDR12X · 64 sticks · +25,000 nodes', desc: 'This is a joke, dont buy it, it cant even be used' }
+      ],
+      net: [
+        { id: 'net1', name: 'NetLink 1G', star: 1, type: 'net', cost: 0, scanRange: 1, traceReduce: 0, spec: 'Range 1 · -0% trace', desc: 'Basic NIC' },
+        { id: 'net2', name: 'NetLink 10G', star: 2, type: 'net', cost: 150, scanRange: 2, traceReduce: 8, spec: 'Range 2 · -8% trace', desc: '10G NIC' },
+        { id: 'net3', name: 'PhantomNet 25G', star: 3, type: 'net', cost: 400, scanRange: 3, traceReduce: 18, spec: 'Range 3 · -18% trace', desc: 'Stealth NIC' },
+        { id: 'net4', name: 'PhantomNet 100G', star: 4, type: 'net', cost: 750, scanRange: 4, traceReduce: 28, spec: 'Range 4 · -28% trace', desc: '100G pro NIC' },
+        { id: 'net5', name: 'PhantomNet Ghost', star: 4, type: 'net', cost: 1000, scanRange: 6, traceReduce: 40, spec: 'Range 6 · -40% trace', desc: 'Ultra-stealth NIC' },
+        { id: 'net6', name: 'PhantomNet Ghost V2', star: 5, type: 'net', cost: 1500, scanRange: 7, traceReduce: 50, spec: 'Range 7 · -50% trace', desc: 'Ultra-stealth NIC' },
+        { id: 'net7', name: 'PhantomNet Invisibility', star: 6, type: 'net', cost: 2250, scanRange: 10, traceReduce: 95, spec: 'Range 10 · -95% trace', desc: 'True-stealth Techonology' },
 
-      { id: 'ram12', name: 'OmegaRAM 128GB DDR7', star: 4, type: 'ram', cost: 8500, memType: 'DDR7', sticks: 4, nodeBonus: 160, spec: 'DDR7 · 4 sticks · +160 nodes', desc: 'Elite performance' },
-      { id: 'ram13', name: 'NovaTech 256GB DDR7', star: 5, type: 'ram', cost: 14000, memType: 'DDR7', sticks: 8, nodeBonus: 240, spec: 'DDR7 · 8 sticks · +240 nodes', desc: 'Ultra capacity' },
+        { id: 'net8', name: 'PhantomNet Visibility Matrix', star: 6, type: 'net', cost: 3000, scanRange: 12, traceReduce: -10, spec: 'Range 12 · +10% trace', desc: 'Anti-stealth Techonology' },
+      ],
+      gpu: [
+        /* Entry (1 Star) */
+        { id: 'gpu1', name: 'PixelForce 2600', star: 1, type: 'gpu', cost: 50, hackBonus: 1, spec: '+1% hack · Something IDK', desc: 'Budget Entry GPU' },
+        { id: 'gpu1', name: 'PixelForce 2600', star: 1, type: 'gpu', cost: 250, hackBonus: 2, spec: '+2% hack · CUDA crack', desc: 'Entry GPU' },
+        { id: 'gpu2', name: 'PixelForce 2900', star: 1, type: 'gpu', cost: 500, hackBonus: 4, spec: '+4% hack · parallel ops', desc: 'Entry GPU' },
+        { id: 'gpu3', name: 'PixelForce 3600', star: 1, type: 'gpu', cost: 800, hackBonus: 7, spec: '+7% hack · parallel ops', desc: 'Entry GPU' },
 
-      { id: 'ram14', name: 'OmegaRAM 512GB DDR8', star: 5, type: 'ram', cost: 20000, memType: 'DDR8', sticks: 8, nodeBonus: 320, spec: 'DDR8 · 8 sticks · +320 nodes', desc: 'Cutting-edge' },
-      { id: 'ram15', name: 'NovaTech 1TB DDR8', star: 5, type: 'ram', cost: 32000, memType: 'DDR8', sticks: 12, nodeBonus: 450, spec: 'DDR8 · 12 sticks · +450 nodes', desc: 'Server-grade monster' },
-      { id: 'ram16', name: 'NovaTech 2TB DDR8', star: 6, type: 'ram', cost: 50000, memType: 'DDR8', sticks: 16, nodeBonus: 700, spec: 'DDR8 · 16 sticks · +700 nodes', desc: 'Absolute maximum' },
-      { id: 'ram17', name: 'NovaTech 8TB DDR8', star: 6, type: 'ram', cost: 100000, memType: 'DDR8', sticks: 16, nodeBonus: 1000, spec: 'DDR8 · 16 sticks · +1000 nodes', desc: 'True Power' }
-    ],
-    net: [
-      { id: 'net1', name: 'NetLink 1G', star: 1, type: 'net', cost: 0, scanRange: 1, traceReduce: 0, spec: 'Range 1 · -0% trace', desc: 'Basic NET' },
-      { id: 'net2', name: 'NetLink 10G', star: 2, type: 'net', cost: 300, scanRange: 2, traceReduce: 8, spec: 'Range 2 · -8% trace', desc: '10G NET' },
-      { id: 'net3', name: 'PhantomNet 25G', star: 3, type: 'net', cost: 700, scanRange: 3, traceReduce: 18, spec: 'Range 3 · -18% trace', desc: 'Stealth NET' },
-      { id: 'net4', name: 'PhantomNet 100G', star: 4, type: 'net', cost: 1500, scanRange: 4, traceReduce: 28, spec: 'Range 4 · -28% trace', desc: '100G pro NET' },
-      { id: 'net5', name: 'PhantomNet Ghost', star: 5, type: 'net', cost: 3000, scanRange: 6, traceReduce: 40, spec: 'Range 6 · -40% trace', desc: 'Ultra-stealth NET' },
-      { id: 'net6', name: 'PhantomNet Ghost V2', star: 5, type: 'net', cost: 3000, scanRange: 7, traceReduce: 50, spec: 'Range 7 · -50% trace', desc: 'Ultra-stealth NET' },
-      { id: 'net7', name: 'PhantomNet Invisibility', star: 7, type: 'net', cost: 3000, scanRange: 10, traceReduce: 95, spec: 'Range 10 · -95% trace', desc: 'True-stealth Techonology' },
-    ],
-    gpu: [
-      /* Entry (1 Star) */
-      { id: 'gpu1', name: 'PixelForce 2600', star: 1, type: 'gpu', cost: 250, hackBonus: 2, spec: '+2% hack · CUDA crack', desc: 'Entry GPU' },
-      { id: 'gpu2', name: 'PixelForce 2900', star: 1, type: 'gpu', cost: 500, hackBonus: 4, spec: '+4% hack · parallel ops', desc: 'Entry GPU' },
-      { id: 'gpu3', name: 'PixelForce 3600', star: 1, type: 'gpu', cost: 800, hackBonus: 7, spec: '+7% hack · parallel ops', desc: 'Entry GPU' },
+        /* Mid (2-3 Star) */
+        { id: 'gpu4', name: 'PixelForce 4900', star: 2, type: 'gpu', cost: 1800, hackBonus: 15, spec: '+15% hack · tensor ops', desc: 'Mid GPU' },
+        { id: 'gpu5', name: 'PixelForce 5600', star: 2, type: 'gpu', cost: 2200, hackBonus: 18, spec: '+18% hack · tensor ops', desc: 'Mid GPU' },
+        { id: 'gpu6', name: 'PixelForce 5800', star: 3, type: 'gpu', cost: 2700, hackBonus: 24, spec: '+24% hack · tensor ops', desc: 'Mid GPU' },
 
-      /* Mid (2-3 Star) */
-      { id: 'gpu4', name: 'PixelForce 4900', star: 2, type: 'gpu', cost: 1800, hackBonus: 15, spec: '+15% hack · tensor ops', desc: 'Mid GPU' },
-      { id: 'gpu5', name: 'PixelForce 5600', star: 2, type: 'gpu', cost: 2200, hackBonus: 18, spec: '+18% hack · tensor ops', desc: 'Mid GPU' },
-      { id: 'gpu6', name: 'PixelForce 5800', star: 3, type: 'gpu', cost: 2700, hackBonus: 24, spec: '+24% hack · tensor ops', desc: 'Mid GPU' },
-
-      /* High End (4-5 Star) */
-      { id: 'gpu7', name: 'PixelForce 7500', star: 4, type: 'gpu', cost: 3500, hackBonus: 30, spec: '+30% hack · AI brute', desc: 'HighEnd GPU' },
-      { id: 'gpu8', name: 'NovaTech 8090', star: 4, type: 'gpu', cost: 5000, hackBonus: 35, spec: '+35% hack · AI brute', desc: 'HighEnd GPU' },
-      { id: 'gpu9', name: 'NovaTech 9060', star: 5, type: 'gpu', cost: 7500, hackBonus: 40, spec: '+40% hack · AI brute', desc: 'Flagship GPU' },
-
-      /* WhY dId YoU bUy ThIs? (6 Star) */
-      { id: 'gpu10', name: 'NovaTech Universe X1', star: 6, type: 'gpu', cost: 10000, hackBonus: 50, spec: '+50% hack · WhY dId YoU bUy ThIs?', desc: 'Bragging Rights Level GPU' },
-    ],
+        /* High End (4-5 Star) */
+        { id: 'gpu7', name: 'PixelForce 7500', star: 4, type: 'gpu', cost: 3500, hackBonus: 30, spec: '+30% hack · AI brute', desc: 'HighEnd GPU' },
+        { id: 'gpu8', name: 'NovaTech 8090', star: 4, type: 'gpu', cost: 5000, hackBonus: 35, spec: '+35% hack · AI brute', desc: 'HighEnd GPU' },
+        { id: 'gpu9', name: 'NovaTech 9060', star: 5, type: 'gpu', cost: 7500, hackBonus: 40, spec: '+40% hack · AI brute', desc: 'Flagship GPU' },
+        { id: 'gpu10', name: 'NovaTech Binary', star: 5, type: 'gpu', cost: 10000, hackBonus: 50, spec: '+50% hack · Only Binary', desc: 'Flagship GPU' },
+      ],
     };
 
     const ALL_PARTS = Object.values(PARTS).flat();
     const SLOT_TYPES = ['mb', 'cpu', 'ram', 'net', 'gpu'];
+
+    /* ═══════════════════════════════════════════════════
+       HACKING TOOLS CATALOG
+    ═══════════════════════════════════════════════════ */
+    const TOOLS = [
+      { id: 'tool_seq1',   name: 'SequenceKey I',    icon: '⌨', cost: 300,  desc: 'Basic sequence breaker. Easy 4-step pattern.', game: 'sequence', difficulty: 1, uses: 3 },
+      { id: 'tool_seq2',   name: 'SequenceKey II',   icon: '⌨', cost: 800,  desc: 'Advanced sequence breaker. 6-step pattern.', game: 'sequence', difficulty: 2, uses: 3 },
+      { id: 'tool_seq3',   name: 'SequenceKey III',  icon: '⌨', cost: 2000, desc: 'Expert sequence breaker. 8-step pattern.', game: 'sequence', difficulty: 3, uses: 3 },
+      { id: 'tool_fw1',    name: 'PathRouter I',     icon: '⬡', cost: 400,  desc: 'Routes packets through a 4×4 firewall grid.', game: 'firewall', difficulty: 1, uses: 3 },
+      { id: 'tool_fw2',    name: 'PathRouter II',    icon: '⬡', cost: 1000, desc: 'Routes packets through a 5×5 firewall grid.', game: 'firewall', difficulty: 2, uses: 3 },
+      { id: 'tool_fw3',    name: 'PathRouter III',   icon: '⬡', cost: 2500, desc: 'Routes packets through a 6×6 firewall grid.', game: 'firewall', difficulty: 3, uses: 3 },
+      { id: 'tool_fw3',    name: 'PathRouter IV',    icon: '⬡', cost: 5000, desc: 'Routes packets through a 10x10 firewall grid.', game: 'firewall', difficulty: 4, uses: 3 },
+      { id: 'tool_dec1',   name: 'HexDecryptor I',   icon: '⚿', cost: 500,  desc: 'Matches 4 hex pairs. Generous timer.', game: 'decrypt', difficulty: 1, uses: 3 },
+      { id: 'tool_dec2',   name: 'HexDecryptor II',  icon: '⚿', cost: 1200, desc: 'Matches 6 hex pairs. Moderate timer.', game: 'decrypt', difficulty: 2, uses: 3 },
+      { id: 'tool_dec3',   name: 'HexDecryptor III', icon: '⚿', cost: 3000, desc: 'Matches 8 hex pairs. Tight timer.', game: 'decrypt', difficulty: 3, uses: 3 },
+    ];
+
+    // playerTools: { toolId: count }
+    let playerTools = {};
 
     /* ═══════════════════════════════════════════════════
        STATE
@@ -1058,6 +1474,10 @@
     // inventory = all purchased parts (including what's installed)
     let inventory = [...['mb1', 'cpu1', 'ram1', 'ram1', 'net1']]; // start with defaults
     let shopTabCurrent = 'mb', shopSelected = null;
+    let activeTool = null; // currently selected tool id
+    let bossMinigameNode = null; // node being attacked via minigame
+    // Temp boost charges (populated by black market)
+    let hackBoostCharges = 0, lootBoostCharges = 0;
     // Drag state
     let panActive = false, panMoved = false, panStart = { x: 0, y: 0 }, camAtPanStart = { x: 0, y: 0 };
     let nodeDrag = null, nodeDragOrigin = {}, nodeDragMoved = false;
@@ -1094,7 +1514,8 @@
 
     function hackChance(node) {
       const { hackBonus } = getRigStats();
-      return Math.min(0.95, Math.max(0.05, 0.92 + hackBonus / 100 - (node.star - 1) * 0.20));
+      // Base 0.85 for 1★, drops steeply per star: -0.18 per star above 1
+      return Math.min(0.95, Math.max(0.05, 0.85 + hackBonus / 100 - (node.star - 1) * 0.18));
     }
     function hackPenalty(node) {
       const base = [8, 12, 18, 26, 36][node.star - 1] || 15;
@@ -1187,7 +1608,7 @@
       const sx = mw / WORLD_W, sy = mh / WORLD_H;
       Object.values(nodes).forEach(n => {
         if (!n.visible) return;
-        const col = n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : '#778899';
+        const col = n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : n.type === 'spawnedNetwork' ? '#FFFFFF' : '#778899';
         ctx.fillStyle = col + '99';
         ctx.beginPath(); ctx.arc(n.wx * sx, n.wy * sy, 2.5, 0, Math.PI * 2); ctx.fill();
       });
@@ -1212,29 +1633,17 @@
     /* ═══════════════════════════════════════════════════
        NODES
     ═══════════════════════════════════════════════════ */
-    function createNode(type, secured, wx, wy) {
+    function createNode(type, secured, wx, wy, forceStar) {
       const id = guid();
-      const classes = ['bank', 'house', 'store']
-      const deviceclasses = ['laptop', 'phone', 'tablet', 'server']
-      const randomIndex = type === 'network' ? rnd(1, classes.length) - 1 : type === 'device' ? rnd(1, deviceclasses.lenght) - 1: 0
-      const chosenclass = type === 'network' ? classes[randomIndex]: type === 'device' ? deviceclasses[randomIndex]: 'nothing i supose'
-
-      console.log('the class is ' + chosenclass)
+      const star = forceStar !== undefined ? forceStar :
+        (()=>{ const r=Math.random(); return r<0.55?1:r<0.82?2:r<0.93?3:r<0.98?4:5; })();
       const n = {
-        id, 
-        type, 
-        classification: chosenclass,
-        secured, 
-        reward: rnd(50, 200), 
-        connections: [],
-        scanned: false, 
-        hacked: type === 'home', 
-        loggedIn: type === 'home',
-        star: (()=>{ const r=Math.random(); return r<0.55?1:r<0.82?2:r<0.93?3:r<0.98?4:5; })(), 
-        wx, 
-        wy, 
-        visible: type !== 'device', 
+        id, type, secured, reward: rnd(25, 100) * star, connections: [],
+        scanned: false, hacked: type === 'home', loggedIn: type === 'home',
+        star, wx, wy, visible: type !== 'device', isBoss: star === 6
       };
+      if (n.isBoss) n.reward = rnd(2500, 5000); // big boss reward
+      if (n.type === 'home') n.star = 3; // home is always 3 star
       nodes[id] = n;
       nodeTraces[id] = { amount: 0, lockedUntil: 0 };
       return n;
@@ -1248,7 +1657,7 @@
       const s = w2s(n.wx, n.wy);
       g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${zoom})`);
       g.dataset.nid = n.id;
-      const col = n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : '#778899';
+      const col = n.isBoss ? '#ff4444' : n.type === 'home' ? '#00ff96' : n.type === 'network' ? '#0096ff' : '#778899';
       if (n.type === 'home') {
         const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         ring.setAttribute('r', '28'); ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', '#00ff9640'); ring.setAttribute('stroke-width', '1');
@@ -1258,9 +1667,18 @@
         a2.setAttribute('attributeName', 'opacity'); a2.setAttribute('values', '.5;0;.5'); a2.setAttribute('dur', '3s'); a2.setAttribute('repeatCount', 'indefinite');
         ring.appendChild(a1); ring.appendChild(a2); g.appendChild(ring);
       }
-
+      // Boss outer glow ring
+      if (n.isBoss) {
+        const bossRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        bossRing.setAttribute('r', '26'); bossRing.setAttribute('fill', 'none');
+        bossRing.setAttribute('stroke', '#ff444466'); bossRing.setAttribute('stroke-width', '3');
+        bossRing.setAttribute('class', 'boss-ring');
+        const ba = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        ba.setAttribute('attributeName', 'r'); ba.setAttribute('values', '22;30;22'); ba.setAttribute('dur', '1.5s'); ba.setAttribute('repeatCount', 'indefinite');
+        bossRing.appendChild(ba); g.appendChild(bossRing);
+      }
       const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circ.setAttribute('r', '20'); circ.setAttribute('fill', col + '18'); circ.setAttribute('stroke', col); circ.setAttribute('stroke-width', '1.5');
+      circ.setAttribute('r', n.isBoss ? '22' : '20'); circ.setAttribute('fill', col + '18'); circ.setAttribute('stroke', col); circ.setAttribute('stroke-width', n.isBoss ? '2.5' : '1.5');
       g.appendChild(circ);
       const locRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       locRing.setAttribute('r', '25'); locRing.setAttribute('fill', 'none');
@@ -1270,9 +1688,9 @@
       locRing.id = 'loc-' + n.id; g.appendChild(locRing);
       const icon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       icon.setAttribute('text-anchor', 'middle'); icon.setAttribute('dominant-baseline', 'central');
-      icon.setAttribute('fill', col); icon.setAttribute('font-size', '13');
+      icon.setAttribute('fill', col); icon.setAttribute('font-size', n.isBoss ? '14' : '13');
       icon.style.fontFamily = 'Share Tech Mono,monospace'; icon.style.pointerEvents = 'none';
-      icon.textContent = n.type === 'home' ? 'H' : n.type === 'network' ? 'N' : 'D'; 
+      icon.textContent = n.isBoss ? '!' : (n.type === 'home' ? 'H' : n.type === 'network' ? 'N' : 'D');
       // Add fancy node items
       // alr bet
 
@@ -1289,12 +1707,12 @@
 
       g.appendChild(icon);
       const starsEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      starsEl.setAttribute('text-anchor', 'middle'); starsEl.setAttribute('y', '32');
-      starsEl.setAttribute('fill', '#ffd700'); starsEl.setAttribute('font-size', '9');
-      starsEl.style.pointerEvents = 'none'; starsEl.textContent = '*'.repeat(n.star);
+      starsEl.setAttribute('text-anchor', 'middle'); starsEl.setAttribute('y', '34');
+      starsEl.setAttribute('fill', n.isBoss ? '#ff4444' : '#ffd700'); starsEl.setAttribute('font-size', '9');
+      starsEl.style.pointerEvents = 'none'; starsEl.textContent = n.isBoss ? '★★★★★★' : '★'.repeat(n.star);
       g.appendChild(starsEl);
       const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      badge.setAttribute('text-anchor', 'middle'); badge.setAttribute('y', '-28');
+      badge.setAttribute('text-anchor', 'middle'); badge.setAttribute('y', '-30');
       badge.setAttribute('fill', '#00ff96'); badge.setAttribute('font-size', '8');
       badge.style.pointerEvents = 'none'; badge.id = 'bdg-' + n.id;
       badge.style.display = (n.hacked && n.type !== 'home') ? 'block' : 'none';
@@ -1432,12 +1850,14 @@
       const onNode = currentLocation === n.id;
       const locked = isNodeLocked(n.id);
       const t = getNodeTrace(n.id);
-      document.getElementById('pop-title').textContent = n.type.toUpperCase() + ' #' + n.id.slice(0, 4);
+      document.getElementById('pop-title').textContent = (n.isBoss ? '⚠ BOSS ' : '') + n.type.toUpperCase() + ' #' + n.id.slice(0, 4);
       const parts = [];
       if (n.hacked) parts.push('OWNED'); if (n.loggedIn) parts.push('LOGGED IN'); if (onNode) parts.push('HERE');
-      document.getElementById('pop-meta').textContent = `Reward: $${n.reward} · ${parts.join(' · ') || 'SECURED'}`;
+      if (n.isBoss && !n.hacked) parts.push('$' + n.reward + ' REWARD');
+      document.getElementById('pop-meta').textContent = `Reward: $${n.reward} · ${parts.join(' · ') || (n.isBoss ? 'BOSS NODE' : 'SECURED')}`;
       const chance = Math.round(hackChance(n) * 100);
-      document.getElementById('pop-stars').textContent = '*'.repeat(n.star) + '·'.repeat(5 - n.star) + `  ${chance}% hack`;
+      const starStr = n.isBoss ? '★★★★★★  BOSS' : ('*'.repeat(n.star) + '·'.repeat(Math.max(0, 5 - n.star)) + `  ${chance}% hack`);
+      document.getElementById('pop-stars').textContent = starStr;
       document.getElementById('pop-trace-fill').style.width = t.amount + '%';
       const lockoutEl = document.getElementById('pop-lockout');
       if (locked) {
@@ -1450,13 +1870,30 @@
       const vis = Object.values(nodes).filter(x => x.visible).length;
       const atLimit = vis >= maxNodes;
       const blocked = locked;
+      // SCAN
       document.getElementById('btn-scan').disabled = n.scanned || n.type === 'device' || !player.canScan || atLimit || blocked;
       document.getElementById('btn-scan').textContent = locked ? '[ LOCKED ]' : n.scanned ? '[ SCANNED ]' : atLimit ? '[ NODE LIMIT ]' : '[ SCAN ]';
-      document.getElementById('btn-hack').disabled = n.hacked || blocked;
-      document.getElementById('btn-hack').textContent = locked ? '[ LOCKED ]' : n.hacked ? '[ OWNED ]' : `[ HACK (${chance}%) ]`;
+      // HACK vs BREACH
+      const hackBtn = document.getElementById('btn-hack');
+      const breachBtn = document.getElementById('btn-breach');
+      if (n.isBoss && !n.hacked) {
+        hackBtn.style.display = 'none';
+        breachBtn.style.display = 'block';
+        breachBtn.disabled = blocked;
+        const hasAnyTool = Object.values(playerTools).some(c => c > 0);
+        breachBtn.textContent = blocked ? '[ LOCKED ]' : !hasAnyTool ? '[ NEED HACKING TOOL ]' : '[ BREACH NODE ]';
+        breachBtn.disabled = blocked || !hasAnyTool;
+      } else {
+        hackBtn.style.display = 'block';
+        breachBtn.style.display = 'none';
+        hackBtn.disabled = n.hacked || blocked;
+        hackBtn.textContent = locked ? '[ LOCKED ]' : n.hacked ? '[ OWNED ]' : `[ HACK (${chance}%) ]`;
+      }
+      // LOGIN
       const adj = isAdjacent(n);
       document.getElementById('btn-login').disabled = !n.hacked || n.loggedIn || !adj || blocked;
       document.getElementById('btn-login').textContent = locked ? '[ LOCKED ]' : n.loggedIn ? '[ LOGGED IN ]' : !n.hacked ? '[ HACK FIRST ]' : !adj ? '[ NOT ADJACENT ]' : '[ LOGIN ]';
+      // LOOT
       const now = Date.now(), cdExp = lootCDs[n.id] || 0, onCD = now < cdExp;
       const lootOk = n.loggedIn && onNode && !onCD && !blocked;
       document.getElementById('btn-loot').disabled = !lootOk;
@@ -1467,7 +1904,23 @@
     function isAdjacent(n) {
       if (!currentLocation) return false;
       const loc = nodes[currentLocation];
-      return loc && loc.loggedIn && (loc.connections.includes(n.id) || currentLocation === n.id);
+      if (!loc || !loc.loggedIn) return false;
+      // Can never log back into the home node once you've left it
+      if (n.type === 'home') return false;
+      // Direct neighbour or same node
+      if (loc.connections.includes(n.id) || currentLocation === n.id) return true;
+      // Sibling rule: if on a device, allow moving to any sibling device
+      // that shares the same parent network node (logged-in), without
+      // needing to hop through the network node first.
+      if (loc.type === 'device' && n.type === 'device') {
+        return loc.connections.some(pid => {
+          const parent = nodes[pid];
+          return parent && parent.type === 'network'
+            && parent.loggedIn
+            && parent.connections.includes(n.id);
+        });
+      }
+      return false;
     }
 
     /* ═══════════════════════════════════════════════════
@@ -1479,24 +1932,46 @@
       const { maxNodes } = getRigStats();
       const vis = Object.values(nodes).filter(x => x.visible).length;
       if (vis >= maxNodes) { addLog('Node limit reached — upgrade RAM', 'var(--warn)'); return; }
-      currentNode.scanned = !(currentNode.type === 'home'); player.canScan = false;
-      const nets = currentNode.type === "home" ? generateNetwork(currentNode, 1): generateNetwork(currentNode, maxNodes - vis);
+      currentNode.scanned = true; player.canScan = false;
+      const nets = currentNode.type === 'home' ? generateNetwork(currentNode, 1): generateNetwork(currentNode, maxNodes - vis);
       nets.forEach(n => { renderNode(n); addLineFor(currentNode, n); });
       addLog(`Scanned: found ${nets.length} network(s)`, '#0096ff');
-      closePopup(); 
-      setTimeout(() => { player.canScan = true; }, 1200);
-      updateHUD(); 
-      drawMinimap();
+      // Boss spawn: if scanning a 5-star (or 6-star) node, 20% chance a boss appears nearby
+      if ((currentNode.star === 5 || currentNode.star === 6) && Math.random() < 0.20 && vis + nets.length < maxNodes) {
+        const angle = Math.random() * Math.PI * 2;
+        const bwx = clamp(currentNode.wx + Math.cos(angle) * 220, 20, WORLD_W - 20);
+        const bwy = clamp(currentNode.wy + Math.sin(angle) * 220, 20, WORLD_H - 20);
+        const boss = createNode('network', true, bwx, bwy, 6);
+        connectNodes(currentNode, boss);
+        renderNode(boss); addLineFor(currentNode, boss);
+        addLog('⚠ BOSS NODE DETECTED — use hacking tools to breach!', 'var(--danger)');
+      }
+      closePopup(); setTimeout(() => { player.canScan = true; }, 1200);
+      updateHUD(); drawMinimap();
     }
 
     function doHack() {
       if (!currentNode || currentNode.hacked) return;
       if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot hack — node locked', 'var(--danger)'); return; }
-      if (Math.random() < hackChance(currentNode)) {
+      if (currentNode.isBoss) { addLog('Boss node — use [ BREACH ] with a hacking tool', 'var(--danger)'); return; }
+      // Skill: phantom bounce bonus on already-traced nodes
+      const tracedBonus = (typeof getSkillEffect === 'function' && getNodeTrace(currentNode.id).amount > 50)
+        ? getSkillEffect('tracedHackBonus') / 100 : 0;
+      // Black market hack boost
+      let boostVal = 0;
+      if (hackBoostCharges > 0) { boostVal = 0.25; hackBoostCharges--; addLog(`Hack boost active (${hackBoostCharges} left)`, 'var(--gold)'); }
+      const effectiveChance = Math.min(0.97, hackChance(currentNode) + tracedBonus + boostVal);
+      if (Math.random() < effectiveChance) {
         currentNode.hacked = true;
         const b = document.getElementById('bdg-' + currentNode.id);
         if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
         addLog(`Hacked ${currentNode.id.slice(0, 4)} (${currentNode.star}*)!`, 'var(--home)');
+        // Skill XP
+        if (typeof gainXP === 'function') gainXP(15 * currentNode.star);
+        // Mission tracking
+        if (typeof checkMissionEvent === 'function') checkMissionEvent('hack', currentNode);
+        // Node ownership
+        if (typeof startOwnership === 'function') startOwnership(currentNode.id);
       } else {
         const pen = hackPenalty(currentNode);
         addNodeTrace(currentNode.id, pen * 1.5);
@@ -1506,10 +1981,17 @@
       updateHUD(); refreshPopup();
     }
 
-    function hideOrphanedDevices(loggedOutNodeId) {
+    function doBreach() {
+      if (!currentNode || currentNode.hacked || !currentNode.isBoss) return;
+      openMinigame(currentNode);
+    }
+
+    function hideOrphanedDevices(loggedOutNodeId, exceptNodeId) {
       // Hide devices connected to loggedOutNodeId if they have no other logged-in parent network node
+      // exceptNodeId: don't hide this device (the one we're moving to)
       const parent = nodes[loggedOutNodeId]; if (!parent) return;
       parent.connections.forEach(cid => {
+        if (cid === exceptNodeId) return; // keep the destination visible
         const sub = nodes[cid];
         if (!sub || sub.type !== 'device' || !sub.visible) return;
         // Check if any other connected node is still logged in
@@ -1522,59 +2004,27 @@
       redrawLines(); drawMinimap();
     }
 
-    function hideSiblingDevices(deviceNode) {
-      deviceNode.connections.forEach(parentId => {
-        const parent = nodes[parentId];
-        if (!parent || parent.type !== 'network') return;
-        parent.connections.forEach(cid => {
-          if (cid === deviceNode.id) return;
-          const sib = nodes[cid];
-          if (!sib || sib.type !== 'device' || !sib.visible) return;
-          sib.visible = false;
-          if (nodeEls[sib.id]) { nodeEls[sib.id].g.remove(); delete nodeEls[sib.id]; }
-        });
-      });
-      redrawLines(); drawMinimap();
-    }
-
     function doLogin() {
       if (!currentNode || !currentNode.hacked || currentNode.loggedIn) return;
       if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot login — node locked', 'var(--danger)'); return; }
       if (!isAdjacent(currentNode)) { addLog('Must be on adjacent node to login', 'var(--warn)'); return; }
-      
+      // Log out of all other non-home nodes and hide their orphaned devices
       Object.values(nodes).forEach(n => {
         if (n.id !== currentNode.id && n.loggedIn && n.type !== 'home') {
           n.loggedIn = false;
-          hideOrphanedDevices(n.id);
+          hideOrphanedDevices(n.id, currentNode.id);
           addLog(`Logged out of ${n.id.slice(0, 4)}`, 'var(--muted)');
         }
       });
       currentNode.loggedIn = true; setLocation(currentNode.id);
-      
-      if (currentNode.type === 'device') {
-        currentNode.connections.forEach(parentId => {
-          const parent = nodes[parentId];
-          if (!parent || parent.type !== 'network') return;
-          parent.connections.forEach(sibId => {
-            if (sibId === currentNode.id) return;
-            const sib = nodes[sibId];
-            if (!sib || sib.type !== 'device' || !sib.visible) return;
-            sib.visible = false;
-            if (nodeEls[sib.id]) { nodeEls[sib.id].g.remove(); delete nodeEls[sib.id]; }
-          });
-        });
-        redrawLines(); drawMinimap();
-      } else {
-        
-        const { maxNodes } = getRigStats();
-        currentNode.connections.forEach(cid => {
-          const sub = nodes[cid];
-          if (sub && sub.type === 'device' && !sub.visible) {
-            const vis = Object.values(nodes).filter(x => x.visible).length;
-            if (vis < maxNodes) { sub.visible = true; renderNode(sub); addLineFor(currentNode, sub); }
-          }
-        });
-      }
+      const { maxNodes } = getRigStats();
+      currentNode.connections.forEach(cid => {
+        const sub = nodes[cid];
+        if (sub && sub.type === 'device' && !sub.visible) {
+          const vis = Object.values(nodes).filter(x => x.visible).length;
+          if (vis < maxNodes) { sub.visible = true; renderNode(sub); addLineFor(currentNode, sub); }
+        }
+      });
       addLog(`Logged into ${currentNode.id.slice(0, 4)}`, 'var(--home)');
       refreshPopup(); updateHUD(); drawMinimap();
     }
@@ -1583,9 +2033,19 @@
       if (!currentNode || !currentNode.loggedIn || currentLocation !== currentNode.id) return;
       if (isNodeOrNeighborLocked(currentNode)) { addLog('Cannot loot — node locked', 'var(--danger)'); return; }
       const now = Date.now();
+      const cd = (typeof getEffectiveLootCD === 'function') ? getEffectiveLootCD() : LOOT_CD;
       if (lootCDs[currentNode.id] && now < lootCDs[currentNode.id]) { addLog('Loot on cooldown', 'var(--warn)'); return; }
-      player.money += currentNode.reward; lootCDs[currentNode.id] = now + LOOT_CD;
-      addLog(`Looted $${currentNode.reward} from ${currentNode.id.slice(0, 4)}`, 'var(--gold)');
+      // Apply skill/boost multipliers if available
+      const skillMult = (typeof getSkillEffect === 'function') ? (1 + getSkillEffect('lootBonus') / 100) : 1;
+      const ownMult   = (typeof getOwnershipMultiplier === 'function') ? getOwnershipMultiplier(currentNode.id) : 1;
+      let lootBoost = 1;
+      if (typeof lootBoostCharges !== 'undefined' && lootBoostCharges > 0) { lootBoost = 1.4; lootBoostCharges--; }
+      const reward = Math.round(currentNode.reward * skillMult * ownMult * lootBoost);
+      player.money += reward;
+      lootCDs[currentNode.id] = now + cd;
+      addLog(`Looted $${reward} from ${currentNode.id.slice(0, 4)}`, 'var(--gold)');
+      if (typeof gainXP === 'function') gainXP(20);
+      if (typeof checkMissionEvent === 'function') checkMissionEvent('loot', currentNode, reward);
       updateHUD();
       const nid = currentNode.id;
       const iv = setInterval(() => { if (Date.now() >= (lootCDs[nid] || 0)) clearInterval(iv); if (currentNode && currentNode.id === nid) refreshPopup(); }, 500);
@@ -1612,14 +2072,13 @@
     }
 
     function generateNetwork(origin, budget) {
-      const r = 185; 
-      const count = origin.name === "home"? 1: clamp(rnd(2, 4), 1, budget); 
-      const nets = [];
+      const r = 185; const count = clamp(rnd(2, 4), 1, budget); const nets = [];
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
         const wx = clamp(origin.wx + Math.cos(angle) * r, 20, WORLD_W - 20);
         const wy = clamp(origin.wy + Math.sin(angle) * r, 20, WORLD_H - 20);
-        const net = createNode('network', true, wx, wy); connectNodes(origin, net);
+        const net = createNode('network', true, wx, wy); 
+        connectNodes(origin, net);
         for (let j = 0; j < rnd(1, 3); j++) {
           const da = angle + (j - 1) * 0.45;
           const dev = createNode('device', true, clamp(wx + Math.cos(da) * 90, 20, WORLD_W - 20), clamp(wy + Math.sin(da) * 90, 20, WORLD_H - 20));
@@ -1663,6 +2122,7 @@
     }
 
     function getCompatNote(p) {
+      // Just a warning note — never blocks purchase
       const mb = getMB();
       if (p.type === 'cpu' && p.socket !== mb.socket) return `⚠ needs ${p.socket} board`;
       if (p.type === 'ram' && p.memType !== mb.memType) return `⚠ needs ${p.memType} board`;
@@ -1681,43 +2141,69 @@
         `<span style="color:var(--text)">Hack: +${s.hackBonus}%</span> · ` +
         `<span style="color:var(--text)">Scan: ${s.scanRange}</span> · ` +
         `<span style="color:var(--text)">Trace reduce: ${s.traceReduce}%</span>`;
-      const parts = PARTS[shopTabCurrent];
       const grid = document.getElementById('parts-grid'); grid.innerHTML = '';
-      parts.forEach(p => {
-        const cnt = invCount(p.id);
-        const note = getCompatNote(p);
-        const card = document.createElement('div');
-        let cls = 'part-card';
-        if (shopSelected === p.id) cls += ' selected';
-        if (cnt > 0) cls += ' is-owned-inv';
-        card.className = cls;
-        const badge = cnt > 0 ? `<div class="inv-tag">IN INVENTORY (x${cnt})</div>` : '';
-        card.innerHTML = badge +
-          `<div class="part-name">${p.name}</div>` +
-          `<div class="part-type-lbl">${p.type.toUpperCase()} · ${p.desc}</div>` +
-          `<div class="part-stars">${'★'.repeat(Math.min(p.star,6))}${'☆'.repeat(Math.max(0,5 - p.star))}</div>` +
-          `<div class="part-spec">${p.spec}</div>` +
-          (note ? `<div class="incompat-reason">${note}</div>` : '') +
-          `<div class="part-cost">${p.cost === 0 ? 'FREE' : '$' + p.cost}</div>`;
-        card.onclick = () => { shopSelected = p.id; renderShop(); };
-        grid.appendChild(card);
-      });
+      if (shopTabCurrent === 'tools') {
+        TOOLS.forEach(t => {
+          const cnt = playerTools[t.id] || 0;
+          const card = document.createElement('div');
+          let cls = 'part-card'; if (shopSelected === t.id) cls += ' selected'; if (cnt > 0) cls += ' is-owned-inv';
+          card.className = cls;
+          const badge = cnt > 0 ? `<div class="inv-tag">x${cnt} OWNED</div>` : '';
+          card.innerHTML = badge +
+            `<div class="part-name">${t.icon} ${t.name}</div>` +
+            `<div class="part-type-lbl">HACKING TOOL · ${t.game.toUpperCase()}</div>` +
+            `<div class="part-stars">${'★'.repeat(t.difficulty)}${'☆'.repeat(3 - t.difficulty)}</div>` +
+            `<div class="part-spec">${t.desc}</div>` +
+            `<div class="part-spec" style="color:var(--text);margin-top:3px">Difficulty ${t.difficulty}/3 · ${t.uses} uses per pack</div>` +
+            `<div class="part-cost">$${t.cost}</div>`;
+          card.onclick = () => { shopSelected = t.id; renderShop(); };
+          grid.appendChild(card);
+        });
+      } else {
+        const parts = PARTS[shopTabCurrent];
+        parts.forEach(p => {
+          const cnt = invCount(p.id);
+          const note = getCompatNote(p);
+          const card = document.createElement('div');
+          let cls = 'part-card';
+          if (shopSelected === p.id) cls += ' selected';
+          if (cnt > 0) cls += ' is-owned-inv';
+          card.className = cls;
+          const badge = cnt > 0 ? `<div class="inv-tag">IN INVENTORY (x${cnt})</div>` : '';
+          card.innerHTML = badge +
+            `<div class="part-name">${p.name}</div>` +
+            `<div class="part-type-lbl">${p.type.toUpperCase()} · ${p.desc}</div>` +
+            `<div class="part-stars">${'★'.repeat(Math.min(p.star,6))}${'☆'.repeat(Math.max(0,5 - p.star))}</div>` +
+            `<div class="part-spec">${p.spec}</div>` +
+            (note ? `<div class="incompat-reason">${note}</div>` : '') +
+            `<div class="part-cost">${p.cost === 0 ? 'FREE' : '$' + p.cost}</div>`;
+          card.onclick = () => { shopSelected = p.id; renderShop(); };
+          grid.appendChild(card);
+        });
+      }
       document.getElementById('shop-buy').disabled = !shopSelected;
       document.getElementById('shop-status').textContent = '';
     }
 
     function buySelected() {
       if (!shopSelected) return;
-      if (inventory.has(p.name)) addLog(`You already own this item ${p.name}`); return;
+      // Check tools first
+      const tool = TOOLS.find(t => t.id === shopSelected);
+      if (tool) {
+        if (player.money < tool.cost) { document.getElementById('shop-status').textContent = 'Insufficient funds'; addLog('Insufficient funds', 'var(--warn)'); return; }
+        player.money -= tool.cost;
+        playerTools[tool.id] = (playerTools[tool.id] || 0) + tool.uses;
+        shopSelected = null;
+        addLog(`Purchased: ${tool.name} (${tool.uses} uses)`, 'var(--gold)');
+        updateHUD(); renderShop(); updateToolsBar(); return;
+      }
       const p = ALL_PARTS.find(x => x.id === shopSelected); if (!p) return;
       if (player.money < p.cost) { document.getElementById('shop-status').textContent = 'Insufficient funds'; addLog('Insufficient funds', 'var(--warn)'); return; }
       player.money -= p.cost;
       inventory.push(p.id);
       shopSelected = null;
       addLog(`Purchased: ${p.name}`, 'var(--gold)');
-      updateHUD(); 
-      renderShop(); 
-      renderBuilderInv();
+      updateHUD(); renderShop(); renderBuilderInv();
     }
 
     /* ═══════════════════════════════════════════════════
@@ -1740,7 +2226,7 @@
       renderBuilderStats();
     }
 
-    const SLOT_LABELS = { mb: 'Motherboard', cpu: 'CPU', ram: 'RAM', net: 'NET', gpu: 'GPU (opt.)' };
+    const SLOT_LABELS = { mb: 'Motherboard', cpu: 'CPU', ram: 'RAM', net: 'NIC', gpu: 'GPU (opt.)' };
 
     function renderBuilderSlots() {
       const container = document.getElementById('builder-slots');
@@ -1768,7 +2254,7 @@
     }
 
     function removeFromSlot(slotType) {
-      if (slotType === 'mb') { pendingRig.cpu = null; pendingRig.ram = null; }
+      if (slotType === 'mb') { pendingRig.cpu = null; pendingRig.ram = null; }// clearing MB clears incompatible
       pendingRig[slotType] = null;
       renderBuilder();
     }
@@ -1779,33 +2265,7 @@
         document.getElementById('builder-status').textContent = `That part goes in the ${p.type.toUpperCase()} slot`;
         setTimeout(() => document.getElementById('builder-status').textContent = '', 2000); return;
       }
-
-      const mb = pendingRig.mb ? getPart(pendingRig.mb) : null;
-      if (mb) {
-        if (p.type === 'cpu' && p.socket !== mb.socket) {
-          document.getElementById('builder-status').textContent = `✗ CPU socket ${p.socket} incompatible with ${mb.socket} board`;
-          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
-        }
-        if (p.type === 'ram' && p.memType !== mb.memType) {
-          document.getElementById('builder-status').textContent = `✗ ${p.memType} RAM incompatible with ${mb.memType} board`;
-          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
-        }
-        if (p.type === 'ram' && p.sticks > mb.slots) {
-          document.getElementById('builder-status').textContent = `✗ RAM needs ${p.sticks} slots, board only has ${mb.slots}`;
-          setTimeout(() => document.getElementById('builder-status').textContent = '', 2500); return;
-        }
-      }
-      if (!mb && (p.type === 'cpu' || p.type === 'ram')) {
-        document.getElementById('builder-status').textContent = `✗ Install a motherboard first`;
-        setTimeout(() => document.getElementById('builder-status').textContent = '', 2000); return;
-      }
-      // If placing MB, clear incompatible parts
-      if (p.type === 'mb') {
-        const curCPU = pendingRig.cpu ? getPart(pendingRig.cpu) : null;
-        const curRAM = pendingRig.ram ? getPart(pendingRig.ram) : null;
-        if (curCPU && curCPU.socket !== p.socket) pendingRig.cpu = null;
-        if (curRAM && (curRAM.memType !== p.memType || curRAM.sticks > p.slots)) pendingRig.ram = null;
-      }
+      // No hard compatibility enforcement — warn only via stats panel
       pendingRig[slotType] = partId;
       // Apply pending rig to live rig
       if (pendingRig.mb && pendingRig.cpu && pendingRig.ram && pendingRig.net) {
@@ -1819,6 +2279,7 @@
     function renderBuilderInv() {
       const list = document.getElementById('inv-list'); if (!list) return;
       list.innerHTML = '';
+      // Deduplicate by id but show count
       const counts = {};
       inventory.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
       const shown = new Set();
@@ -1843,6 +2304,7 @@
 
     function renderBuilderStats() {
       const el = document.getElementById('builder-stats');
+      // Temporarily set rig to pending to calculate stats
       const savedRig = { ...rig };
       if (pendingRig.mb && pendingRig.cpu && pendingRig.ram && pendingRig.net) {
         rig = { ...pendingRig };
@@ -1889,7 +2351,7 @@
     ═══════════════════════════════════════════════════ */
     function buildSaveData() {
       return JSON.stringify({
-        v: 3, player, rig, inventory, cam, zoom,
+        v: 4, player, rig, inventory, playerTools, cam, zoom,
         nodes: Object.values(nodes).map(n => ({ ...n })),
         nodeTraces, lootCDs, currentLocation,
       });
@@ -1922,18 +2384,22 @@
         const d = JSON.parse(json);
         nodes = {}; nodeEls = {}; svgLines = {}; currentNode = null; logLines = [];
         player = d.player; rig = d.rig; inventory = d.inventory || [];
+        playerTools = d.playerTools || {};
         cam = d.cam || { x: 0, y: 0 }; zoom = d.zoom || 1; nodeTraces = d.nodeTraces || {}; lootCDs = d.lootCDs || {};
         const svg = document.getElementById('node-svg');
         svg.innerHTML = '<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0ff6" stroke-width="1.5" stroke-linecap="round"/></marker></defs>';
         document.getElementById('gameover').style.display = 'none'; closePopup();
         d.nodes.forEach(n => { nodes[n.id] = n; });
         currentLocation = d.currentLocation;
+        // FIX B: initialise canvas dimensions BEFORE rendering nodes,
+        // otherwise w2s() produces NaN positions and nodes are invisible.
+        initCanvas();
         Object.values(nodes).forEach(n => { if (n.visible) renderNode(n); });
         // Redraw location ring
         if (currentLocation && nodeEls[currentLocation]) {
           const el = document.getElementById('loc-' + currentLocation); if (el) el.style.display = 'block';
         }
-        redrawLines(); initCanvas(); drawGrid(); drawMinimap(); updateHUD();
+        redrawLines(); drawGrid(); drawMinimap(); updateHUD(); updateToolsBar();
         Object.keys(nodeTraces).forEach(nid => updateNodeVisual(nid));
         addLog('Game loaded.', 'var(--home)');
       } catch (e) { addLog('Load failed: ' + e.message, 'var(--danger)'); }
@@ -1951,38 +2417,1128 @@
       nodes = {}; nodeEls = {}; svgLines = {}; currentNode = null; currentLocation = null;
       lootCDs = {}; nodeTraces = {}; logLines = []; zoom = 1;
       player = { money: 0, canScan: true };
+      playerTools = {};
       rig = { mb: 'mb1', cpu: 'cpu1', ram: 'ram1', net: 'net1', gpu: null };
       inventory = ['mb1', 'cpu1', 'ram1', 'net1'];
-      shopSelected = null;
+      shopSelected = null; activeTool = null; bossMinigameNode = null;
       const svg = document.getElementById('node-svg');
       svg.innerHTML = '<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0ff6" stroke-width="1.5" stroke-linecap="round"/></marker></defs>';
       document.getElementById('shop-modal').style.display = 'none';
       document.getElementById('builder-modal').style.display = 'none';
+      document.getElementById('minigame-overlay').style.display = 'none';
       closePopup();
       cam = { x: clamp(WORLD_W / 2 - canvasW / 2, 0, WORLD_W - canvasW), y: clamp(WORLD_H / 2 - canvasH / 2, 0, WORLD_H - canvasH) };
       const home = createNode('home', false, WORLD_W / 2, WORLD_H / 2);
       currentLocation = home.id; renderNode(home);
-      drawGrid(); drawMinimap(); updateHUD();
+      drawGrid(); drawMinimap(); updateHUD(); updateToolsBar();
       addLog('System boot — home node online.', 'var(--home)');
       addLog('[ BUILD RIG ] to configure hardware', 'var(--muted)');
     }
+    /* ═══════════════════════════════════════════════════
+       TOOLS BAR
+    ═══════════════════════════════════════════════════ */
+    function updateToolsBar() {
+      const bar = document.getElementById('tools-bar');
+      bar.innerHTML = '';
+      const keys = ['1','2','3','4','5','6','7','8','9'];
+      const owned = TOOLS.filter(t => (playerTools[t.id] || 0) > 0);
+      // Always show 5 slots minimum
+      const slots = Math.max(5, owned.length);
+      for (let i = 0; i < Math.min(slots, 9); i++) {
+        const t = owned[i];
+        const slot = document.createElement('div');
+        slot.className = 'tool-slot' + (!t ? ' empty' : '') + (t && activeTool === t.id ? ' active-tool' : '');
+        slot.title = t ? t.name + ' — ' + t.desc : 'Empty';
+        slot.innerHTML = `<span class="tool-key">${keys[i]}</span>` +
+          (t ? `<span class="tool-icon">${t.icon}</span><span class="tool-count">x${playerTools[t.id]}</span>` : '<span style="font-size:11px;color:var(--muted)">·</span>');
+        if (t) slot.onclick = () => {
+          activeTool = (activeTool === t.id) ? null : t.id;
+          updateToolsBar();
+        };
+        bar.appendChild(slot);
+      }
+    }
+
+    // Keyboard shortcuts 1-9 for tools
+    document.addEventListener('keydown', e => {
+      const idx = parseInt(e.key) - 1;
+      if (idx >= 0 && idx <= 8) {
+        const owned = TOOLS.filter(t => (playerTools[t.id] || 0) > 0);
+        const t = owned[idx];
+        if (t) { activeTool = (activeTool === t.id) ? null : t.id; updateToolsBar(); }
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════
+       MINIGAME SYSTEM
+    ═══════════════════════════════════════════════════ */
+    let mgTimer = null, mgTimerLeft = 0, mgTimerMax = 0;
+    let mgSelectedTool = null;
+    let mgActive = false; // true once minigame is running
+
+    function openMinigame(node) {
+      bossMinigameNode = node;
+      mgSelectedTool = activeTool || null;
+      mgActive = false;
+      clearInterval(mgTimer);
+      // Reset all game areas
+      ['mg-sequence-area','mg-firewall-area','mg-decrypt-area'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById('mg-timer-wrap').style.display = 'none';
+      document.getElementById('mg-result').style.display = 'none';
+      document.getElementById('mg-result').textContent = '';
+      document.getElementById('mg-close-btn').style.display = 'none';
+      document.getElementById('mg-start-btn').style.display = 'block';
+      document.getElementById('mg-start-btn').disabled = !mgSelectedTool;
+      document.getElementById('mg-title').textContent = '// BOSS NODE — BREACH REQUIRED';
+      document.getElementById('mg-desc').textContent =
+        `Node #${node.id.slice(0,4)} is a hardened 6-star boss node. Standard hacking fails. Select a tool and complete the breach challenge. Reward: $${node.reward}.`;
+      // Build tool selector
+      const btns = document.getElementById('mg-tool-btns'); btns.innerHTML = '';
+      TOOLS.forEach(t => {
+        const cnt = playerTools[t.id] || 0; if (cnt <= 0) return;
+        const btn = document.createElement('button');
+        btn.className = 'mg-tool-btn' + (mgSelectedTool === t.id ? ' selected-tool' : '');
+        btn.textContent = `${t.icon} ${t.name} (x${cnt})`;
+        btn.onclick = () => {
+          mgSelectedTool = t.id;
+          document.querySelectorAll('.mg-tool-btn').forEach(b => b.classList.remove('selected-tool'));
+          btn.classList.add('selected-tool');
+          document.getElementById('mg-start-btn').disabled = false;
+        };
+        btns.appendChild(btn);
+      });
+      document.getElementById('minigame-overlay').style.display = 'flex';
+    }
+
+    function closeMinigame() {
+      clearInterval(mgTimer);
+      mgActive = false;
+      document.getElementById('minigame-overlay').style.display = 'none';
+      bossMinigameNode = null; mgSelectedTool = null;
+    }
+
+    function startMinigame() {
+      if (!mgSelectedTool || !bossMinigameNode) return;
+      const tool = TOOLS.find(t => t.id === mgSelectedTool); if (!tool) return;
+      // Consume one use
+      playerTools[tool.id]--;
+      if (playerTools[tool.id] <= 0) delete playerTools[tool.id];
+      if (activeTool === tool.id && !playerTools[tool.id]) activeTool = null;
+      updateToolsBar();
+      mgActive = true;
+      document.getElementById('mg-tool-select').style.display = 'none';
+      document.getElementById('mg-start-btn').style.display = 'none';
+      document.getElementById('mg-timer-wrap').style.display = 'block';
+      // Timer durations by difficulty: 1=30s, 2=20s, 3=15s
+      mgTimerMax = [30, 20, 15][tool.difficulty - 1] * 1000;
+      mgTimerLeft = mgTimerMax;
+      document.getElementById('mg-timer-fill').style.width = '100%';
+      clearInterval(mgTimer);
+      mgTimer = setInterval(() => {
+        mgTimerLeft -= 100;
+        document.getElementById('mg-timer-fill').style.width = Math.max(0, (mgTimerLeft / mgTimerMax) * 100) + '%';
+        if (mgTimerLeft <= 0) { clearInterval(mgTimer); onMinigameFail('Time ran out'); }
+      }, 100);
+      if (tool.game === 'sequence') startSequenceGame(tool.difficulty);
+      else if (tool.game === 'firewall') startFirewallGame(tool.difficulty);
+      else if (tool.game === 'decrypt') startDecryptGame(tool.difficulty);
+    }
+
+    function onMinigameWin() {
+      clearInterval(mgTimer);
+      mgActive = false;
+      document.getElementById('mg-timer-fill').style.width = '100%';
+      document.getElementById('mg-timer-fill').style.background = 'var(--home)';
+      const node = bossMinigameNode;
+      if (node) {
+        node.hacked = true;
+        const b = document.getElementById('bdg-' + node.id); if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
+        addLog(`⚡ BOSS BREACHED — node #${node.id.slice(0,4)} hacked! $${node.reward} reward`, 'var(--home)');
+        // Feature hooks (defined later in script, checked defensively)
+        if (typeof startOwnership === 'function') startOwnership(node.id);
+        if (typeof gainXP === 'function') gainXP(100);
+        if (typeof checkMissionEvent === 'function') checkMissionEvent('hack', node);
+      }
+      const res = document.getElementById('mg-result');
+      res.style.display = 'block'; res.style.color = 'var(--home)';
+      res.textContent = `✓ BREACH SUCCESSFUL — $${node ? node.reward : ''} credited on loot`;
+      document.getElementById('mg-close-btn').style.display = 'block';
+      document.getElementById('mg-tool-select').style.display = 'none';
+      updateHUD(); if (currentNode) refreshPopup();
+    }
+
+    function onMinigameFail(reason) {
+      clearInterval(mgTimer);
+      mgActive = false;
+      document.getElementById('mg-timer-fill').style.width = '0%';
+      addLog(`Breach failed — ${reason}`, 'var(--danger)');
+      addNodeTrace(bossMinigameNode ? bossMinigameNode.id : Object.keys(nodeTraces)[0] || '', 30);
+      if (bossMinigameNode) updateNodeVisual(bossMinigameNode.id);
+      const res = document.getElementById('mg-result');
+      res.style.display = 'block'; res.style.color = 'var(--danger)';
+      res.textContent = `✗ BREACH FAILED — ${reason}. Tool charge consumed.`;
+      document.getElementById('mg-close-btn').style.display = 'block';
+      if (currentNode) refreshPopup();
+    }
+
+    /* ── GAME 1: SEQUENCE BREAKER ── */
+    let seqTarget = [], seqCurrent = [], seqPhase = 'watch';
+    const SEQ_CHARS = 'ABCDEF0123456789';
+    function startSequenceGame(diff) {
+      const len = [4, 6, 8][diff - 1];
+      seqTarget = Array.from({length: len}, () => SEQ_CHARS[Math.floor(Math.random() * SEQ_CHARS.length)]);
+      seqCurrent = []; seqPhase = 'watch';
+      document.getElementById('mg-sequence-area').style.display = 'block';
+      document.getElementById('seq-status').textContent = 'Memorise the sequence...';
+      // Flash sequence
+      let i = 0;
+      const disp = document.getElementById('seq-display');
+      disp.textContent = '';
+      const flash = setInterval(() => {
+        disp.textContent = seqTarget.slice(0, i + 1).join(' ');
+        i++;
+        if (i >= seqTarget.length) {
+          clearInterval(flash);
+          setTimeout(() => {
+            disp.textContent = '? '.repeat(seqTarget.length).trim();
+            seqPhase = 'input';
+            document.getElementById('seq-status').textContent = 'Now input the sequence:';
+            buildSeqKeys();
+          }, 800);
+        }
+      }, 600);
+    }
+    function buildSeqKeys() {
+      const row = document.getElementById('seq-input-row'); row.innerHTML = '';
+      // Show all possible chars as buttons
+      [...SEQ_CHARS].forEach(ch => {
+        const btn = document.createElement('button'); btn.className = 'seq-key'; btn.textContent = ch;
+        btn.onclick = () => {
+          if (seqPhase !== 'input' || !mgActive) return;
+          seqCurrent.push(ch);
+          const idx = seqCurrent.length - 1;
+          if (ch === seqTarget[idx]) {
+            btn.classList.add('correct');
+            setTimeout(() => btn.classList.remove('correct'), 300);
+            document.getElementById('seq-display').textContent =
+              seqCurrent.join(' ') + ' ?' .repeat(seqTarget.length - seqCurrent.length);
+            if (seqCurrent.length === seqTarget.length) { seqPhase = 'done'; onMinigameWin(); }
+          } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 300);
+            seqCurrent = [];
+            document.getElementById('seq-status').textContent = `Wrong! Starting over (${seqTarget.length} chars)`;
+            document.getElementById('seq-display').textContent = '? '.repeat(seqTarget.length).trim();
+          }
+        };
+        row.appendChild(btn);
+      });
+    }
+
+    /* ── GAME 2: FIREWALL PATHFINDER ── */
+    let fwGrid = [], fwSize = 4, fwPath = [], fwStart, fwEnd;
+    function startFirewallGame(diff) {
+      fwSize = [4, 5, 6][diff - 1];
+      document.getElementById('mg-firewall-area').style.display = 'block';
+      buildFirewallGrid();
+    }
+    function buildFirewallGrid() {
+      fwStart = 0; fwEnd = fwSize * fwSize - 1; fwPath = [];
+      // Generate random blockers, ensure path exists
+      const total = fwSize * fwSize;
+      const blockCount = Math.floor(total * 0.25);
+      const blocked = new Set();
+      while (blocked.size < blockCount) {
+        const c = Math.floor(Math.random() * total);
+        if (c !== fwStart && c !== fwEnd) blocked.add(c);
+      }
+      fwGrid = Array.from({length: total}, (_, i) => ({
+        idx: i, blocked: blocked.has(i),
+        isStart: i === fwStart, isEnd: i === fwEnd
+      }));
+      renderFWGrid();
+    }
+    function renderFWGrid() {
+      const el = document.getElementById('fw-grid');
+      el.style.gridTemplateColumns = `repeat(${fwSize}, 38px)`;
+      el.innerHTML = '';
+      fwGrid.forEach((cell, i) => {
+        const div = document.createElement('div');
+        let cls = 'fw-cell';
+        if (cell.blocked) cls += ' blocked';
+        else if (cell.isStart) cls += ' start';
+        else if (cell.isEnd) cls += ' end';
+        else if (fwPath.includes(i)) cls += ' path';
+        div.className = cls;
+        div.textContent = cell.isStart ? 'S' : cell.isEnd ? 'E' : cell.blocked ? '✕' : fwPath.indexOf(i) >= 0 ? '·' : '';
+        if (!cell.blocked) div.onclick = () => fwCellClick(i);
+        el.appendChild(div);
+      });
+    }
+    function fwCellClick(idx) {
+      if (!mgActive) return;
+      const last = fwPath.length > 0 ? fwPath[fwPath.length - 1] : fwStart;
+      // Adjacent check (no diagonals)
+      const row = Math.floor(idx / fwSize), col = idx % fwSize;
+      const lrow = Math.floor(last / fwSize), lcol = last % fwSize;
+      const adjacent = (Math.abs(row - lrow) + Math.abs(col - lcol)) === 1;
+      if (!adjacent) { document.getElementById('fw-status').textContent = 'Must move to adjacent cell'; return; }
+      if (fwGrid[idx].blocked) return;
+      if (fwPath.includes(idx)) { // backtrack
+        fwPath = fwPath.slice(0, fwPath.indexOf(idx)); renderFWGrid(); return;
+      }
+      if (idx !== fwStart) fwPath.push(idx);
+      renderFWGrid();
+      if (idx === fwEnd) { onMinigameWin(); }
+      else document.getElementById('fw-status').textContent = `Path: ${fwPath.length + 1} cells`;
+    }
+
+    /* ── GAME 3: HEX DECRYPT ── */
+    let decCards = [], decFlipped = [], decMatched = 0, decLockout = false;
+    function startDecryptGame(diff) {
+      const pairs = [4, 6, 8][diff - 1];
+      document.getElementById('mg-decrypt-area').style.display = 'block';
+      const hexVals = Array.from({length: pairs}, () =>
+        Math.floor(Math.random() * 0xFF).toString(16).toUpperCase().padStart(2, '0'));
+      const doubled = [...hexVals, ...hexVals].sort(() => Math.random() - 0.5);
+      decCards = doubled.map((v, i) => ({ idx: i, val: v, flipped: false, matched: false }));
+      decFlipped = []; decMatched = 0; decLockout = false;
+      renderDecryptGrid();
+    }
+    function renderDecryptGrid() {
+      const grid = document.getElementById('decrypt-grid');
+      grid.innerHTML = '';
+      // 4 columns always
+      grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      decCards.forEach((card, i) => {
+        const div = document.createElement('div');
+        let cls = 'decrypt-card';
+        if (card.matched) cls += ' matched';
+        else if (card.flipped) cls += ' flipped';
+        div.className = cls;
+        div.textContent = (card.flipped || card.matched) ? card.val : '??';
+        div.onclick = () => decCardClick(i);
+        grid.appendChild(div);
+      });
+      document.getElementById('decrypt-status').textContent =
+        `Matched: ${decMatched} / ${decCards.length / 2}`;
+    }
+    function decCardClick(i) {
+      if (!mgActive || decLockout) return;
+      const card = decCards[i];
+      if (card.flipped || card.matched) return;
+      card.flipped = true; decFlipped.push(i); renderDecryptGrid();
+      if (decFlipped.length === 2) {
+        decLockout = true;
+        const [a, b] = decFlipped;
+        if (decCards[a].val === decCards[b].val) {
+          decCards[a].matched = decCards[b].matched = true;
+          decFlipped = []; decMatched++; decLockout = false;
+          renderDecryptGrid();
+          document.getElementById('decrypt-status').textContent = `Matched: ${decMatched} / ${decCards.length / 2}`;
+          if (decMatched === decCards.length / 2) onMinigameWin();
+        } else {
+          setTimeout(() => {
+            decCards[a].flipped = decCards[b].flipped = false;
+            decFlipped = []; decLockout = false; renderDecryptGrid();
+          }, 900);
+        }
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       ★ A. SKILL TREE SYSTEM
+    ═══════════════════════════════════════════════════ */
+    const SKILL_TREE = {
+      stealth: {
+        label: 'STEALTH', color: '#00bfff',
+        nodes: [
+          { id: 'st1', name: 'Ghost Protocol',    desc: 'Reduce trace gain by 15% per rank.',    maxRank: 3, costPerRank: 1, effect: 'traceRedBonus', val: 15 },
+          { id: 'st2', name: 'Signal Mask',        desc: 'Locked node cooldown -30s per rank.',    maxRank: 3, costPerRank: 2, requires: 'st1', effect: 'lockoutReduce', val: 30000 },
+          { id: 'st3', name: 'Phantom Bounce',     desc: '+5% hack success on already-traced nodes per rank.', maxRank: 2, costPerRank: 2, requires: 'st2', effect: 'tracedHackBonus', val: 5 },
+        ]
+      },
+      brute: {
+        label: 'BRUTE FORCE', color: '#ff4444',
+        nodes: [
+          { id: 'bf1', name: 'Overclock',          desc: '+8% hack chance per rank.',              maxRank: 4, costPerRank: 1, effect: 'hackBonus', val: 8 },
+          { id: 'bf2', name: 'Ram Exploit',         desc: '+20% loot reward per rank.',             maxRank: 3, costPerRank: 2, requires: 'bf1', effect: 'lootBonus', val: 20 },
+          { id: 'bf3', name: 'Boss Crusher',        desc: '+15% breach minigame time per rank.',    maxRank: 2, costPerRank: 3, requires: 'bf2', effect: 'bossTimeBonus', val: 15 },
+        ]
+      },
+      efficiency: {
+        label: 'EFFICIENCY', color: '#ffd700',
+        nodes: [
+          { id: 'ef1', name: 'Cache Optimizer',    desc: 'Loot cooldown -40s per rank.',            maxRank: 4, costPerRank: 1, effect: 'lootCDReduce', val: 40000 },
+          { id: 'ef2', name: 'Node Multiplier',    desc: '+2 max nodes per rank.',                  maxRank: 3, costPerRank: 2, requires: 'ef1', effect: 'extraNodes', val: 2 },
+          { id: 'ef3', name: 'Passive Tap',        desc: '+15% passive income per rank on owned nodes.', maxRank: 3, costPerRank: 2, requires: 'ef2', effect: 'passiveBonus', val: 15 },
+        ]
+      }
+    };
+
+    // skillRanks: { skillId: currentRank }
+    let skillRanks = {};
+    let skillXP = 0, skillPoints = 0;
+    const XP_PER_LEVEL = 200;
+
+    function gainXP(amount) {
+      skillXP += amount;
+      while (skillXP >= XP_PER_LEVEL) { skillXP -= XP_PER_LEVEL; skillPoints++; addLog(`Skill point earned! (${skillPoints} total)`, 'var(--gold)'); }
+    }
+
+    function getSkillRank(id) { return skillRanks[id] || 0; }
+
+    function getSkillEffect(effectName) {
+      let total = 0;
+      for (const branch of Object.values(SKILL_TREE)) {
+        for (const sk of branch.nodes) {
+          if (sk.effect === effectName) total += getSkillRank(sk.id) * sk.val;
+        }
+      }
+      return total;
+    }
+
+    function openSkillTree() {
+      document.getElementById('skilltree-overlay').style.display = 'flex';
+      renderSkillTree();
+    }
+    function closeSkillTree() { document.getElementById('skilltree-overlay').style.display = 'none'; }
+
+    function renderSkillTree() {
+      document.getElementById('sk-points-display').textContent =
+        `Skill Points: ${skillPoints}  ·  XP: ${skillXP}/${XP_PER_LEVEL}  ·  Hacks unlocking skill XP`;
+      document.getElementById('sk-xp-bar').style.width = (skillXP / XP_PER_LEVEL * 100) + '%';
+      const container = document.getElementById('sk-branches');
+      container.innerHTML = '';
+      for (const [bKey, branch] of Object.entries(SKILL_TREE)) {
+        const col = document.createElement('div');
+        col.className = 'sk-branch ' + bKey;
+        col.innerHTML = `<div class="sk-branch-title" style="color:${branch.color}">${branch.label}</div>`;
+        const nodeRow = document.createElement('div'); nodeRow.className = 'sk-node-row';
+        branch.nodes.forEach(sk => {
+          const rank = getSkillRank(sk.id);
+          const maxed = rank >= sk.maxRank;
+          const reqMet = !sk.requires || getSkillRank(sk.requires) > 0;
+          const canAfford = skillPoints >= sk.costPerRank;
+          const locked = !reqMet;
+          const div = document.createElement('div');
+          div.className = 'sk-node' + (maxed ? ' sk-maxed' : rank > 0 ? ' sk-unlocked' : '') + (locked ? ' sk-locked' : '');
+          div.innerHTML = `<div class="sk-node-rank">${rank}/${sk.maxRank}</div>` +
+            `<div class="sk-node-name">${sk.name}</div>` +
+            `<div class="sk-node-desc">${sk.desc}</div>` +
+            `<div class="sk-node-cost">${maxed ? '✓ MAXED' : locked ? '🔒 Requires prev' : canAfford ? `Cost: ${sk.costPerRank} SP` : `Need ${sk.costPerRank} SP`}</div>`;
+          if (!locked && !maxed) {
+            div.onclick = () => { if (skillPoints >= sk.costPerRank) { skillPoints -= sk.costPerRank; skillRanks[sk.id] = rank + 1; addLog(`Skill: ${sk.name} → Rank ${rank+1}`, branch.color); updateHUD(); renderSkillTree(); } };
+          }
+          nodeRow.appendChild(div);
+        });
+        col.appendChild(nodeRow); container.appendChild(col);
+      }
+    }
+
+    /* Patch getRigStats to include skill bonuses */
+    const _origGetRigStats = getRigStats;
+    getRigStats = function() {
+      const s = _origGetRigStats();
+      s.maxNodes += getSkillEffect('extraNodes');
+      s.hackBonus += getSkillEffect('hackBonus');
+      s.traceReduce = Math.min(99, s.traceReduce + getSkillEffect('traceRedBonus'));
+      return s;
+    };
+
+    /* Patch hackPenalty to include stealth */
+    const _origHackPenalty = hackPenalty;
+    hackPenalty = function(node) {
+      const base = _origHackPenalty(node);
+      return Math.round(base * (1 - getSkillEffect('traceRedBonus') / 100));
+    };
+
+    /* Patch lockout duration */
+    function getEffectiveLockoutMS() {
+      return Math.max(30000, NODE_LOCKOUT_MS - getSkillEffect('lockoutReduce'));
+    }
+
+    /* Patch loot cooldown */
+    function getEffectiveLootCD() {
+      return Math.max(30000, LOOT_CD - getSkillEffect('lootCDReduce'));
+    }
+
+    /* doHack is fully featured inline above */
+
+    /* ═══════════════════════════════════════════════════
+       ★ B. PROCEDURAL MISSIONS
+    ═══════════════════════════════════════════════════ */
+    const MISSION_TEMPLATES = [
+      { type: 'hack_nodes',    desc: n => `Hack ${n} nodes without getting traced.`,  param: [3,5,7],  xpR: [50,80,120], credR: [300,600,1000], checkFn: 'hack', cond: (e,m) => !getNodeTrace(e.id).amount || getNodeTrace(e.id).amount < 80 },
+      { type: 'hack_stars',    desc: n => `Hack ${n} nodes of 3★ or higher.`,          param: [2,4,6],  xpR: [60,100,150], credR: [400,700,1200], checkFn: 'hack', cond: (e,m) => e.star >= 3 },
+      { type: 'hack_stars',    desc: n => `Hack ${n} nodes of 4★ or higher.`,          param: [6,9,12],  xpR: [1200,1800,2400], credR: [600,900,1200], checkFn: 'hack', cond: (e,m) => e.star >= 4 },
+      { type: 'loot_credits',  desc: n => `Loot $${n} total from nodes.`,              param: [500,1200,2500], xpR: [40,80,130], credR: [250,500,900], checkFn: 'loot', cond: (e,m) => true, accumulate: true },
+      { type: 'breach_bosses', desc: n => `Breach ${n} boss node(s).`,                 param: [1,2,3],  xpR: [100,200,350], credR: [800,1800,3500], checkFn: 'hack', cond: (e,m) => e.isBoss },
+      { type: 'hack_untraced', desc: n => `Hack ${n} nodes with 0% trace.`,            param: [3,5,8],  xpR: [70,110,160], credR: [350,650,1100], checkFn: 'hack', cond: (e,m) => getNodeTrace(e.id).amount === 0 },
+    ];
+
+    let activeMissions = []; // [{template, paramIdx, progress, goal, claimed}]
+    let missionHacksSinceTrace = 0;
+
+    function generateMission() {
+      const tpl = MISSION_TEMPLATES[Math.floor(Math.random() * MISSION_TEMPLATES.length)];
+      const diff = Math.floor(Math.random() * 3);
+      return {
+        id: Math.random().toString(36).slice(2),
+        template: tpl,
+        paramIdx: diff,
+        goal: tpl.param[diff],
+        progress: 0,
+        progressVal: 0,
+        claimed: false,
+        xp: tpl.xpR[diff],
+        cred: tpl.credR[diff],
+        desc: tpl.desc(tpl.param[diff])
+      };
+    }
+
+    function refreshMissions() {
+      activeMissions = [generateMission(), generateMission(), generateMission()];
+      renderMissionsPanel();
+    }
+
+    function checkMissionEvent(eventType, node, amount) {
+      activeMissions.forEach(m => {
+        if (m.claimed || m.progress >= m.goal) return;
+        if (m.template.checkFn !== eventType) return;
+        if (!m.template.cond(node, m)) return;
+        if (m.template.type === 'loot_credits') {
+          m.progressVal = (m.progressVal || 0) + (amount || node.reward || 0);
+          m.progress = Math.min(m.goal, Math.floor(m.progressVal / (m.goal / m.goal)));
+          // For loot type, goal is credit amount
+          if (m.progressVal >= m.goal) m.progress = m.goal;
+        } else {
+          m.progress = Math.min(m.goal, m.progress + 1);
+        }
+      });
+      renderMissionsPanel();
+    }
+
+    function claimMission(idx) {
+      const m = activeMissions[idx];
+      if (!m || m.claimed || m.progress < m.goal) return;
+      m.claimed = true;
+      player.money += m.cred;
+      gainXP(m.xp);
+      addLog(`Mission complete! +$${m.cred} +${m.xp}XP`, 'var(--home)');
+      updateHUD(); renderMissionsPanel();
+      // Auto-replace after a moment
+      setTimeout(() => {
+        activeMissions[idx] = generateMission();
+        renderMissionsPanel();
+      }, 2000);
+    }
+
+    function renderMissionsPanel() {
+      const list = document.getElementById('missions-list');
+      if (!list) return;
+      list.innerHTML = '';
+      activeMissions.forEach((m, idx) => {
+        const complete = m.progress >= m.goal;
+        const card = document.createElement('div');
+        card.className = 'mission-card' + (m.claimed ? '' : complete ? ' mc-complete' : ' mc-active');
+        const progDisplay = m.template.type === 'loot_credits'
+          ? `$${Math.min(m.progressVal||0, m.goal)}/$${m.goal}`
+          : `${m.progress}/${m.goal}`;
+        const pct = m.template.type === 'loot_credits'
+          ? Math.min(100, ((m.progressVal||0)/m.goal)*100)
+          : (m.progress/m.goal)*100;
+        card.innerHTML = `<div class="mission-title">${m.template.type.replace(/_/g,' ').toUpperCase()}</div>` +
+          `<div class="mission-desc">${m.desc}</div>` +
+          `<div class="mission-prog"><div class="mission-prog-fill" style="width:${pct}%"></div></div>` +
+          `<div class="mission-reward">Progress: ${progDisplay} · Reward: $${m.cred} +${m.xp}XP</div>` +
+          (complete && !m.claimed ? `<button class="mission-claim-btn" onclick="claimMission(${idx})">[ CLAIM REWARD ]</button>` : m.claimed ? '<div style="font-size:9px;color:var(--home);margin-top:4px;font-family:var(--mono)">✓ CLAIMED</div>' : '');
+        list.appendChild(card);
+      });
+    }
+
+    /* override doLoot to fire mission event with amount */
+    const _lootForMissions = doLoot;
+    doLoot = function() {
+      const prevMoney = player.money;
+      _lootForMissions();
+      const gained = player.money - prevMoney;
+      if (gained > 0) checkMissionEvent('loot', currentNode, gained);
+    };
+
+    /* ═══════════════════════════════════════════════════
+       ★ C. BLACK MARKET
+    ═══════════════════════════════════════════════════ */
+    const BM_CATALOG = [
+      { id: 'bm_ghost',    name: 'Ghost Daemon',    type: 'ONE-TIME', desc: 'Instantly clear trace on all nodes.', cost: 1500, rarity: 'RARE',   icon: '👻', effect: 'clearAllTrace' },
+      { id: 'bm_ice',      name: 'ICE Breaker',     type: 'TOOL PACK',desc: 'Grants 5× SequenceKey III.', cost: 3000, rarity: 'RARE',   icon: '❄️', effect: 'giveSeqIII' },
+      { id: 'bm_amp',      name: 'Signal Amplifier', type: 'BOOST',   desc: '+25% hack chance for next 10 hacks.', cost: 2000, rarity: 'EPIC',   icon: '📡', effect: 'hackBoostTmp', param: 10 },
+      { id: 'bm_vault',    name: 'Data Vault',      type: 'PASSIVE',  desc: 'Instantly collect all owned node passive income.', cost: 800, rarity: 'COMMON', icon: '🏦', effect: 'collectPassive' },
+      { id: 'bm_proxy',    name: 'Proxy Chain',     type: 'ONE-TIME', desc: 'Unlock a random hacked node\'s loot cooldown instantly.', cost: 600, rarity: 'COMMON', icon: '🔗', effect: 'unlockLoot' },
+      { id: 'bm_surge',    name: 'Overclock Surge', type: 'BOOST',    desc: '+40% loot yield for next 5 loots.', cost: 1200, rarity: 'UNCOMMON', icon: '⚡', effect: 'lootBoostTmp', param: 5 },
+      { id: 'bm_darkfw',   name: 'Dark Firewall',   type: 'TOOL PACK',desc: 'Grants 5× PathRouter III.', cost: 3500, rarity: 'RARE', icon: '🔥', effect: 'giveFWIII' },
+      { id: 'bm_scramble', name: 'Signal Scramble', type: 'ONE-TIME', desc: 'Halve trace on all traced nodes.', cost: 700, rarity: 'COMMON', icon: '📶', effect: 'halfTrace' },
+      { id: 'bm_skeleton', name: 'Skeleton Key',    type: 'ONE-TIME', desc: 'Auto-hack one random un-hacked node.', cost: 2500, rarity: 'EPIC', icon: '🗝️', effect: 'autoHack' },
+    ];
+
+    let bmStock = [];        // current rotation: [{item, sold}]
+    let bmSelected = null;
+    let bmRotateAt = 0;
+    const BM_ROTATE_MS = 3 * 60 * 1000;
+
+    function rollBlackMarket() {
+      const shuffled = [...BM_CATALOG].sort(() => Math.random() - .5).slice(0, 5);
+      bmStock = shuffled.map(item => ({ item, sold: false }));
+      bmSelected = null;
+      bmRotateAt = Date.now() + BM_ROTATE_MS;
+    }
+
+    function openBlackMarket() {
+      if (!bmStock.length || Date.now() > bmRotateAt) rollBlackMarket();
+      document.getElementById('blackmarket-overlay').style.display = 'flex';
+      renderBlackMarket();
+    }
+    function closeBlackMarket() { document.getElementById('blackmarket-overlay').style.display = 'none'; bmSelected = null; }
+
+    function renderBlackMarket() {
+      const timeLeft = Math.max(0, Math.ceil((bmRotateAt - Date.now()) / 1000));
+      const mins = Math.floor(timeLeft / 60), secs = timeLeft % 60;
+      document.getElementById('bm-rotate-info').textContent = `Inventory rotates in ${mins}:${String(secs).padStart(2,'0')} — rare items, limited supply`;
+      const grid = document.getElementById('bm-grid'); grid.innerHTML = '';
+      bmStock.forEach((slot, idx) => {
+        const { item, sold } = slot;
+        const card = document.createElement('div');
+        card.className = 'bm-card' + (sold ? ' bm-sold' : bmSelected === idx ? ' bm-selected' : '');
+        card.innerHTML = `<div class="bm-rare-tag">${item.rarity}</div>` +
+          `<div class="bm-card-name">${item.icon} ${item.name}</div>` +
+          `<div class="bm-card-type">${item.type}</div>` +
+          `<div class="bm-card-desc">${item.desc}</div>` +
+          `<div class="bm-card-cost">${sold ? '<span class="bm-sold-tag">SOLD OUT</span>' : '$' + item.cost}</div>`;
+        if (!sold) card.onclick = () => { bmSelected = idx; renderBlackMarket(); };
+        grid.appendChild(card);
+      });
+      document.getElementById('bm-buy-btn').disabled = bmSelected === null;
+      document.getElementById('bm-status').textContent = '';
+    }
+
+    function bmBuySelected() {
+      if (bmSelected === null) return;
+      const slot = bmStock[bmSelected]; if (!slot || slot.sold) return;
+      const item = slot.item;
+      if (player.money < item.cost) { document.getElementById('bm-status').textContent = 'Insufficient funds'; return; }
+      player.money -= item.cost;
+      slot.sold = true;
+      applyBlackMarketEffect(item);
+      addLog(`Black market: ${item.name} acquired`, 'var(--danger)');
+      bmSelected = null;
+      updateHUD(); renderBlackMarket();
+    }
+
+    function applyBlackMarketEffect(item) {
+      switch (item.effect) {
+        case 'clearAllTrace':
+          Object.keys(nodeTraces).forEach(nid => { nodeTraces[nid].amount = 0; nodeTraces[nid].lockedUntil = 0; updateNodeVisual(nid); });
+          addLog('All traces cleared!', 'var(--home)'); break;
+        case 'giveSeqIII':
+          playerTools['tool_seq3'] = (playerTools['tool_seq3'] || 0) + 5; updateToolsBar(); break;
+        case 'giveFWIII':
+          playerTools['tool_fw3'] = (playerTools['tool_fw3'] || 0) + 5; updateToolsBar(); break;
+        case 'hackBoostTmp':
+          hackBoostCharges += item.param || 10;
+          addLog(`+25% hack chance for next ${hackBoostCharges} hacks`, 'var(--home)'); break;
+        case 'lootBoostTmp':
+          lootBoostCharges += item.param || 5;
+          addLog(`+40% loot yield for next ${lootBoostCharges} loots`, 'var(--home)'); break;
+        case 'collectPassive':
+          const earned = collectAllPassive();
+          addLog(`Collected $${earned} passive income`, 'var(--gold)'); break;
+        case 'unlockLoot':
+          const locked = Object.keys(lootCDs).filter(nid => Date.now() < lootCDs[nid] && nodes[nid]);
+          if (locked.length) { const pick = locked[Math.floor(Math.random()*locked.length)]; delete lootCDs[pick]; addLog(`Loot cooldown cleared on node ${pick.slice(0,4)}`, 'var(--home)'); }
+          else addLog('No nodes on loot cooldown', 'var(--muted)'); break;
+        case 'halfTrace':
+          Object.keys(nodeTraces).forEach(nid => { nodeTraces[nid].amount = Math.floor(nodeTraces[nid].amount / 2); updateNodeVisual(nid); });
+          addLog('All traces halved!', 'var(--home)'); break;
+        case 'autoHack':
+          const unhacked = Object.values(nodes).filter(n => !n.hacked && !n.isBoss && n.type !== 'home');
+          if (unhacked.length) {
+            const target = unhacked[Math.floor(Math.random()*unhacked.length)];
+            target.hacked = true;
+            const b = document.getElementById('bdg-'+target.id); if (b) { b.textContent='OWN'; b.style.display='block'; }
+            startOwnership(target.id);
+            addLog(`Skeleton key: auto-hacked node ${target.id.slice(0,4)}`, 'var(--home)');
+          } else addLog('No hackable nodes found', 'var(--muted)'); break;
+      }
+      if (currentNode) refreshPopup();
+    }
+
+    // Rotate timer display
+    setInterval(() => { if (document.getElementById('blackmarket-overlay').style.display === 'flex') { if (Date.now() > bmRotateAt) { rollBlackMarket(); } renderBlackMarket(); } }, 1000);
+
+    /* ═══════════════════════════════════════════════════
+       ★ D. NODE OWNERSHIP — PASSIVE INCOME
+    ═══════════════════════════════════════════════════ */
+    // ownedNodes: { nodeId: { capturedAt, level, lastCollect } }
+    let ownedNodes = {};
+    const PASSIVE_INCOME_INTERVAL = 30 * 1000; // every 30s
+    const PASSIVE_BASE_RATE = 0.08; // 8% of node reward per tick
+
+    function startOwnership(nodeId) {
+      if (!ownedNodes[nodeId]) {
+        ownedNodes[nodeId] = { capturedAt: Date.now(), lastCollect: Date.now(), level: 1 };
+      }
+    }
+
+    function getOwnershipMultiplier(nodeId) {
+      const own = ownedNodes[nodeId];
+      if (!own) return 1;
+      return 1 + (own.level - 1) * 0.1; // +10% loot per level
+    }
+
+    function getPassiveRate(nodeId) {
+      const n = nodes[nodeId]; if (!n) return 0;
+      const own = ownedNodes[nodeId]; if (!own) return 0;
+      const baseIncome = Math.round(n.reward * PASSIVE_BASE_RATE);
+      const skillMult = 1 + getSkillEffect('passiveBonus') / 100;
+      return Math.round(baseIncome * own.level * skillMult);
+    }
+
+    function collectAllPassive() {
+      let total = 0;
+      Object.keys(ownedNodes).forEach(nid => {
+        const n = nodes[nid]; if (!n) return;
+        const income = getPassiveRate(nid);
+        total += income;
+      });
+      player.money += total;
+      updateHUD();
+      return total;
+    }
+
+    // Passive income tick
+    setInterval(() => {
+      let total = 0;
+      const ticker = document.getElementById('income-ticker');
+      Object.keys(ownedNodes).forEach(nid => {
+        const n = nodes[nid]; if (!n || !n.hacked) return;
+        const own = ownedNodes[nid];
+        const now = Date.now();
+        if (now - own.lastCollect >= PASSIVE_INCOME_INTERVAL) {
+          const income = getPassiveRate(nid);
+          own.lastCollect = now;
+          total += income;
+          // XP for owning nodes
+          gainXP(3);
+        }
+      });
+      if (total > 0) {
+        player.money += total;
+        updateHUD();
+        addLog(`Passive income: +$${total}`, 'var(--home)');
+        // Floating text
+        if (ticker) {
+          const pop = document.createElement('div');
+          pop.className = 'income-pop';
+          pop.textContent = '+$' + total;
+          pop.style.left = (Math.random() * 60 - 30) + 'px';
+          ticker.appendChild(pop);
+          setTimeout(() => pop.remove(), 1800);
+        }
+      }
+    }, 5000);
+
+    /* patch save/load to include new state */
+    const _origBuildSaveData = buildSaveData;
+    buildSaveData = function() {
+      const d = JSON.parse(_origBuildSaveData());
+      d.skillRanks = skillRanks; d.skillXP = skillXP; d.skillPoints = skillPoints;
+      d.ownedNodes = ownedNodes; d.activeMissions = activeMissions.map(m => ({...m, template: null, templateType: m.template.type}));
+      d.hackBoostCharges = hackBoostCharges; d.lootBoostCharges = lootBoostCharges;
+      return JSON.stringify(d);
+    };
+    const _origApplyLoad = applyLoad;
+    applyLoad = function(json) {
+      _origApplyLoad(json);
+      try {
+        const d = JSON.parse(json);
+        skillRanks = d.skillRanks || {}; skillXP = d.skillXP || 0; skillPoints = d.skillPoints || 0;
+        ownedNodes = d.ownedNodes || {};
+        hackBoostCharges = d.hackBoostCharges || 0; lootBoostCharges = d.lootBoostCharges || 0;
+        if (d.activeMissions) {
+          activeMissions = d.activeMissions.map(sm => {
+            const tpl = MISSION_TEMPLATES.find(t => t.type === sm.templateType);
+            return tpl ? { ...sm, template: tpl } : generateMission();
+          });
+        }
+        renderMissionsPanel();
+      } catch(e) {}
+    };
+    const _origInitGame = initGame;
+    initGame = function() {
+      _origInitGame();
+      skillRanks = {}; skillXP = 0; skillPoints = 0;
+      ownedNodes = {}; hackBoostCharges = 0; lootBoostCharges = 0;
+      rollBlackMarket(); refreshMissions();
+    };
+
+    /* ═══════════════════════════════════════════════════
+       ★ C. LAN MULTIPLAYER — WebRTC DataChannel
+       No server needed. Manual offer/answer exchange.
+       Syncs: node hacked state, player locations,
+              loot CDs, log messages, cursor positions.
+    ═══════════════════════════════════════════════════ */
+    const MP_COLORS = ['#00bfff','#ff6ec7','#ffd700','#ff4444','#00ff96','#ff8c00'];
+    let mpPeers = {};     // { peerId: { pc, dc, name, color, avatarEl, lastSeen } }
+    let mpMyId   = null;  // unique id for this session
+    let mpMyName = 'Runner';
+    let mpMyColor = MP_COLORS[Math.floor(Math.random() * MP_COLORS.length)];
+
+    // ICE servers — STUN only (works on LAN without TURN)
+    const MP_ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+    function mpGenId() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+    if (!mpMyId) mpMyId = mpGenId();
+
+    /* ── UI helpers ── */
+    function openMultiplayer() {
+      document.getElementById('mp-name-input').value = mpMyName;
+      document.getElementById('mp-overlay').style.display = 'flex';
+      mpRenderPeers();
+    }
+    function closeMultiplayer() { document.getElementById('mp-overlay').style.display = 'none'; }
+
+    function mpSetStatus(elId, msg, cls) {
+      const el = document.getElementById(elId); if (!el) return;
+      el.textContent = msg; el.className = 'mp-status ' + (cls || '');
+    }
+    function mpCopyText(elId) {
+      const el = document.getElementById(elId); if (!el) return;
+      navigator.clipboard.writeText(el.value).catch(() => { el.select(); document.execCommand('copy'); });
+      const prev = el.style.borderColor; el.style.borderColor = 'var(--home)';
+      setTimeout(() => el.style.borderColor = prev, 600);
+    }
+
+    function mpRenderPeers() {
+      const list = document.getElementById('mp-peers-list'); if (!list) return;
+      const peers = Object.values(mpPeers);
+      if (!peers.length) { list.innerHTML = '<div style="font-size:9px;color:var(--muted)">No peers connected yet.</div>'; return; }
+      list.innerHTML = '';
+      peers.forEach(p => {
+        const row = document.createElement('div'); row.className = 'mp-peer-row';
+        const age = Math.round((Date.now() - (p.lastSeen || Date.now())) / 1000);
+        row.innerHTML = `<div class="mp-peer-dot" style="background:${p.color}"></div>`+
+          `<div class="mp-peer-name">${p.name || p.id}</div>`+
+          `<div class="mp-peer-ping">${p.dc && p.dc.readyState==='open' ? '● LIVE' : '○ disconnected'}</div>`;
+        list.appendChild(row);
+      });
+      // Update HUD badge
+      const connected = peers.filter(p => p.dc && p.dc.readyState === 'open').length;
+      const badge = document.getElementById('mp-badge');
+      if (badge) { badge.textContent = connected ? ` ${connected}P` : ''; badge.style.display = connected ? 'inline' : 'none'; }
+    }
+
+    /* ── Avatar on map ── */
+    function mpGetOrCreateAvatar(peerId, color, name) {
+      const wrap = document.getElementById('canvas-wrap'); if (!wrap) return null;
+      let av = document.getElementById('mp-av-' + peerId);
+      if (!av) {
+        av = document.createElement('div'); av.className = 'mp-avatar'; av.id = 'mp-av-' + peerId;
+        av.innerHTML = `<div class="mp-avatar-dot" style="background:${color}"></div><div>${name||peerId}</div>`;
+        wrap.appendChild(av);
+      }
+      return av;
+    }
+    function mpMoveAvatar(peerId, wx, wy) {
+      const peer = mpPeers[peerId]; if (!peer) return;
+      const av = mpGetOrCreateAvatar(peerId, peer.color, peer.name);
+      if (!av) return;
+      const s = w2s(wx, wy);
+      av.style.left = s.x + 'px'; av.style.top = s.y + 'px';
+    }
+    function mpRemoveAvatar(peerId) {
+      const av = document.getElementById('mp-av-' + peerId);
+      if (av) av.remove();
+    }
+
+    /* ── Broadcast helpers ── */
+    function mpBroadcast(msg) {
+      const str = JSON.stringify(msg);
+      Object.values(mpPeers).forEach(p => {
+        if (p.dc && p.dc.readyState === 'open') { try { p.dc.send(str); } catch(e) {} }
+      });
+    }
+
+    /* ── Message handler ── */
+    function mpHandleMessage(peerId, raw) {
+      let msg; try { msg = JSON.parse(raw); } catch { return; }
+      const peer = mpPeers[peerId]; if (peer) peer.lastSeen = Date.now();
+      switch (msg.type) {
+        case 'hello':
+          if (peer) { peer.name = msg.name; peer.color = msg.color; }
+          mpRenderPeers();
+          // Send full state snapshot to new peer
+          mpSendStateTo(peerId);
+          addLog(`${msg.name} joined the network`, msg.color || 'var(--net)');
+          break;
+        case 'pos':
+          if (msg.wx != null) mpMoveAvatar(peerId, msg.wx, msg.wy);
+          break;
+        case 'nodeHacked':
+          if (nodes[msg.nid] && !nodes[msg.nid].hacked) {
+            nodes[msg.nid].hacked = true;
+            const b = document.getElementById('bdg-' + msg.nid);
+            if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
+            addLog(`[${peer?.name||'Peer'}] hacked node ${msg.nid.slice(0,4)}`, peer?.color || 'var(--net)');
+            if (currentNode && currentNode.id === msg.nid) refreshPopup();
+          }
+          break;
+        case 'nodeScanned': {
+          // Peer scanned a node — create those child nodes locally if not present
+          if (msg.origin && msg.children) {
+            msg.children.forEach(nd => {
+              if (!nodes[nd.id]) {
+                nodes[nd.id] = nd;
+                if (nd.visible) { renderNode(nd); }
+              }
+            });
+            msg.children.forEach(nd => {
+              const orig = nodes[msg.origin];
+              if (orig && !orig.connections.includes(nd.id)) connectNodes(orig, nd);
+            });
+            redrawLines(); drawMinimap();
+          }
+          break;
+        }
+        case 'lootCD':
+          lootCDs[msg.nid] = msg.until;
+          if (currentNode && currentNode.id === msg.nid) refreshPopup();
+          break;
+        case 'log':
+          addLog(`[${peer?.name||'Peer'}] ${msg.text}`, peer?.color || 'var(--net)');
+          break;
+        case 'state':
+          // Full state sync from host — merge nodes
+          if (msg.nodes) {
+            msg.nodes.forEach(nd => {
+              if (!nodes[nd.id]) {
+                nodes[nd.id] = nd;
+                if (nd.visible) renderNode(nd);
+              } else {
+                // merge hacked state
+                if (nd.hacked && !nodes[nd.id].hacked) {
+                  nodes[nd.id].hacked = true;
+                  const b = document.getElementById('bdg-' + nd.id);
+                  if (b) { b.textContent = 'OWN'; b.style.display = 'block'; }
+                }
+              }
+            });
+            redrawLines(); drawMinimap(); updateHUD();
+          }
+          break;
+        case 'ping':
+          mpSendTo(peerId, { type: 'pong' });
+          break;
+      }
+    }
+
+    function mpSendTo(peerId, msg) {
+      const peer = mpPeers[peerId];
+      if (peer && peer.dc && peer.dc.readyState === 'open') {
+        try { peer.dc.send(JSON.stringify(msg)); } catch(e) {}
+      }
+    }
+
+    function mpSendStateTo(peerId) {
+      const stateNodes = Object.values(nodes).map(n => ({ ...n }));
+      mpSendTo(peerId, { type: 'state', nodes: stateNodes });
+    }
+
+    /* ── WebRTC peer setup ── */
+    function mpSetupDC(peerId, dc) {
+      dc.onopen = () => {
+        addLog(`Connected to peer ${peerId}`, 'var(--net)');
+        // Announce ourselves
+        mpSendTo(peerId, { type: 'hello', name: mpMyName, color: mpMyColor, id: mpMyId });
+        mpRenderPeers();
+      };
+      dc.onclose = () => {
+        addLog(`Peer ${mpPeers[peerId]?.name || peerId} disconnected`, 'var(--muted)');
+        mpRemoveAvatar(peerId);
+        mpRenderPeers();
+      };
+      dc.onmessage = e => mpHandleMessage(peerId, e.data);
+    }
+
+    /* ── HOST: Create Offer ── */
+    let _mpHostPC = null;
+    async function mpCreateOffer() {
+      mpMyName = document.getElementById('mp-name-input').value.trim() || 'Runner';
+      const peerId = mpGenId();
+      const pc = new RTCPeerConnection(MP_ICE);
+      _mpHostPC = pc;
+      const dc = pc.createDataChannel('netrun', { ordered: true });
+      mpPeers[peerId] = { id: peerId, pc, dc, name: '?', color: MP_COLORS[Object.keys(mpPeers).length % MP_COLORS.length], lastSeen: Date.now() };
+      mpSetupDC(peerId, dc);
+
+      pc.onicecandidate = () => {
+        if (pc.localDescription && pc.localDescription.sdp.includes('\r\na=candidate')) {
+          const offer = btoa(JSON.stringify({ sdp: pc.localDescription, id: mpMyId, name: mpMyName, color: mpMyColor }));
+          document.getElementById('mp-offer-out').value = offer;
+          mpSetStatus('mp-host-status', '✓ Offer ready — copy and send to peer', 'ok');
+        }
+      };
+      pc.onicegatheringstatechange = () => {
+        if (pc.iceGatheringState === 'complete') {
+          const offer = btoa(JSON.stringify({ sdp: pc.localDescription, id: mpMyId, name: mpMyName, color: mpMyColor }));
+          document.getElementById('mp-offer-out').value = offer;
+          mpSetStatus('mp-host-status', '✓ Offer ready — copy and send to peer', 'ok');
+        }
+      };
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      mpSetStatus('mp-host-status', 'Gathering ICE candidates…', 'warn');
+    }
+
+    /* ── JOIN: Accept Offer, Create Answer ── */
+    let _mpJoinPC = null;
+    async function mpCreateAnswer() {
+      mpMyName = document.getElementById('mp-name-input').value.trim() || 'Runner';
+      const raw = document.getElementById('mp-offer-in').value.trim();
+      if (!raw) { mpSetStatus('mp-join-status', '✗ Paste an offer first', 'err'); return; }
+      let offerData; try { offerData = JSON.parse(atob(raw)); } catch { mpSetStatus('mp-join-status', '✗ Invalid offer code', 'err'); return; }
+
+      const peerId = offerData.id || mpGenId();
+      const pc = new RTCPeerConnection(MP_ICE);
+      _mpJoinPC = pc;
+      mpPeers[peerId] = { id: peerId, pc, dc: null, name: offerData.name || '?', color: offerData.color || MP_COLORS[0], lastSeen: Date.now() };
+
+      pc.ondatachannel = e => {
+        mpPeers[peerId].dc = e.channel;
+        mpSetupDC(peerId, e.channel);
+      };
+      pc.onicecandidate = () => {};
+      pc.onicegatheringstatechange = () => {
+        if (pc.iceGatheringState === 'complete') {
+          const answer = btoa(JSON.stringify({ sdp: pc.localDescription, id: mpMyId, name: mpMyName, color: mpMyColor }));
+          document.getElementById('mp-answer-out').value = answer;
+          mpSetStatus('mp-join-status', '✓ Answer ready — copy and send back to host', 'ok');
+        }
+      };
+
+      await pc.setRemoteDescription(new RTCSessionDescription(offerData.sdp));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      mpSetStatus('mp-join-status', 'Gathering ICE candidates…', 'warn');
+    }
+
+    /* ── HOST: Accept Answer ── */
+    async function mpAcceptAnswer() {
+      const raw = document.getElementById('mp-answer-in').value.trim();
+      if (!raw) { mpSetStatus('mp-connect-status', '✗ Paste the answer first', 'err'); return; }
+      let answerData; try { answerData = JSON.parse(atob(raw)); } catch { mpSetStatus('mp-connect-status', '✗ Invalid answer code', 'err'); return; }
+      if (!_mpHostPC) { mpSetStatus('mp-connect-status', '✗ Create an offer first', 'err'); return; }
+      try {
+        await _mpHostPC.setRemoteDescription(new RTCSessionDescription(answerData.sdp));
+        mpSetStatus('mp-connect-status', '⏳ Connecting…', 'warn');
+        // Update peer name/color from answer
+        const peerId = answerData.id;
+        const peer = Object.values(mpPeers).find(p => p.pc === _mpHostPC);
+        if (peer && peerId) { peer.name = answerData.name || peer.name; peer.color = answerData.color || peer.color; }
+        setTimeout(() => mpRenderPeers(), 1500);
+      } catch(e) { mpSetStatus('mp-connect-status', '✗ ' + e.message, 'err'); }
+    }
+
+    function mpDisconnectAll() {
+      Object.keys(mpPeers).forEach(id => {
+        const p = mpPeers[id];
+        try { if (p.dc) p.dc.close(); if (p.pc) p.pc.close(); } catch(e) {}
+        mpRemoveAvatar(id);
+      });
+      mpPeers = {}; _mpHostPC = null; _mpJoinPC = null;
+      mpRenderPeers();
+      addLog('All multiplayer connections closed', 'var(--muted)');
+    }
+
+    /* ── Broadcast own position every 2s ── */
+    setInterval(() => {
+      if (!Object.keys(mpPeers).length) return;
+      const loc = nodes[currentLocation];
+      if (loc) mpBroadcast({ type: 'pos', wx: loc.wx, wy: loc.wy, id: mpMyId });
+      // Reposition peer avatars when camera moves
+      Object.keys(mpPeers).forEach(pid => {
+        const p = mpPeers[pid];
+        if (p._wx != null) mpMoveAvatar(pid, p._wx, p._wy);
+      });
+    }, 2000);
+
+    /* Patch repositionAll to also reposition avatars */
+    const _origRepositionAll = repositionAll;
+    repositionAll = function() {
+      _origRepositionAll();
+      Object.keys(mpPeers).forEach(pid => {
+        const p = mpPeers[pid]; if (p._wx != null) mpMoveAvatar(pid, p._wx, p._wy);
+      });
+    };
+
+    /* Store last-known world pos on avatar */
+    const _origMpMoveAvatar = mpMoveAvatar;
+    // Patch mpHandleMessage to store pos on peer object
+    const _origMpHandleMessage = mpHandleMessage;
+    mpHandleMessage = function(peerId, raw) {
+      let msg; try { msg = JSON.parse(raw); } catch { return; }
+      if (msg.type === 'pos' && mpPeers[peerId]) {
+        mpPeers[peerId]._wx = msg.wx; mpPeers[peerId]._wy = msg.wy;
+      }
+      _origMpHandleMessage(peerId, raw);
+    };
+
+    /* Broadcast hacks, loots and scans to peers */
+    const _mpOrigDoHack = doHack;
+    doHack = function() {
+      const before = currentNode ? currentNode.hacked : null;
+      _mpOrigDoHack();
+      if (currentNode && !before && currentNode.hacked) {
+        mpBroadcast({ type: 'nodeHacked', nid: currentNode.id });
+      }
+    };
+
+    const _mpOrigDoLoot = doLoot;
+    doLoot = function() {
+      _mpOrigDoLoot();
+      if (currentNode) {
+        mpBroadcast({ type: 'lootCD', nid: currentNode.id, until: lootCDs[currentNode.id] || 0 });
+      }
+    };
+
+    const _mpOrigDoScan = doScan;
+    doScan = function() {
+      const beforeKeys = new Set(Object.keys(nodes));
+      _mpOrigDoScan();
+      const newNodes = Object.values(nodes).filter(n => !beforeKeys.has(n.id));
+      if (newNodes.length && currentNode) {
+        mpBroadcast({ type: 'nodeScanned', origin: currentNode.id, children: newNodes.map(n => ({ ...n })) });
+      }
+    };
+
     window.addEventListener('resize', () => { initCanvas(); repositionAll(); if (currentNode) repositionPopup(); });
     initCanvas(); initGame();
 
     /* ── CONSOLE COMMANDS ── */
-    window.diddy = {
+    window.funnyNodeGame = {
       help() {
         console.log([
-          'diddy.money(n)       — set credits',
-          'diddy.trace(n)       — set node trace on selected node (0-100)',
-          'diddy.clearTrace()   — clear all node traces and lockouts',
-          'diddy.hackAll()      — hack every visible node',
-          'diddy.revealAll()    — reveal all scanned networks',
-          'diddy.unlockAll()    — clear all lockouts',
-          'diddy.addPart(id)    — add a part to inventory by id',
-          'diddy.listParts()    — list all part ids',
-          'diddy.zoom(n)        — set zoom level (0.15 – 4)',
-          'diddy.god()          — max money + hack everything',
+          'funnyNodeGame.money(n)       — set credits',
+          'funnyNodeGame.trace(n)       — set node trace on selected node (0-100)',
+          'funnyNodeGame.clearTrace()   — clear all node traces and lockouts',
+          'funnyNodeGame.hackAll()      — hack every visible node',
+          'funnyNodeGame.revealAll()    — reveal all scanned networks',
+          'funnyNodeGame.unlockAll()    — clear all lockouts',
+          'funnyNodeGame.addPart(id)    — add a part to inventory by id',
+          'funnyNodeGame.listParts()    — list all part ids',
+          'funnyNodeGame.zoom(n)        — set zoom level (0.15 – 4)',
+          'funnyNodeGame.god()          — max money + hack everything',
+          'funnyNodeGame.node(star)     — creates a node with star \'star\' connected to the current node'
         ].join('\n'));
       },
       money(n) {
@@ -2052,10 +3608,21 @@
         console.log(`Zoom set to ${n}`);
       },
       god() {
-        player.money = 999999; updateHUD();
+        player.money = player.money + 1000000; updateHUD();
         this.hackAll();
         this.clearTrace();
         console.log('God mode enabled');
+      },
+      node(star) {
+        Object.values(nodes).forEach(n => {
+          if (n.type === 'home') {
+            const createdNode = createNode('spawnedNetwork', true, currentNode.wx, currentNode.wy - 250, star)
+            createdNode.visible = true
+            connectNodes(n, createdNode)
+            renderNode(createdNode)
+            console.log('Created and connected node');
+          }
+        });
       },
     };
   </script>
